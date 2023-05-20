@@ -6,12 +6,17 @@
 //
 
 import SwiftUI
+import TourneyKit
 
 @main
 struct TourneyKitTestHarnessApp: App {
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
-        }
-    }
+	init() {
+		
+	}
+	
+	var body: some Scene {
+		WindowGroup {
+			ContentView()
+		}
+	}
 }
