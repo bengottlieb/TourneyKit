@@ -19,17 +19,32 @@ struct ContentView: View {
 			if game.isStarted {
 				RPSGameView(game: game)
 			} else {
-				Button("Start") {
-					Task {
-						try await mgr.startAutomatching(request: game.request, delegate: game)
+				HStack {
+					Button(mgr.isAutomatching ? "Searching…" : "Start") { startGame() }
+						.disabled(mgr.isAutomatching)
+					Button(action: cancelStart) {
+						Image(systemName: "x.circle.fill")
+							.opacity(0.5)
 					}
+					.buttonStyle(.plain)
+					.opacity(mgr.isAutomatching ? 1 : 0)
 				}
-				.disabled(mgr.isAutomatching)
 			}
 		}
 		.onAppear {
 			mgr.authenticate()
+			DispatchQueue.main.asyncAfter(deadline: .now() + 1) { mgr.showingGameCenterAvatar = false }
 		}
+	}
+	
+	func startGame() {
+		Task {
+			try await mgr.startAutomatching(request: game.request, delegate: game)
+		}
+	}
+	
+	func cancelStart() {
+		mgr.cancelAutomatching()
 	}
 }
 
