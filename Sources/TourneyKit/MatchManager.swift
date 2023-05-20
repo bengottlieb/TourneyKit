@@ -14,7 +14,7 @@ import GameKit
 	@Published public var isAuthenticated = false
 	@Published public var isAutomatching = false
 
-	@Published public var activeMatch: ActiveMatch?
+	@Published public var activeMatch: SomeMatch?
 	public var isInMatch: Bool { activeMatch != nil }
 	
 	override private init() {
@@ -28,7 +28,7 @@ import GameKit
 		isAutomatching = false
 	}
 	
-	public func startAutomatching(request: GKMatchRequest, delegate: ActiveMatchDelegate? = nil) async throws {
+	public func startAutomatching<Delegate: ActiveMatchDelegate>(request: GKMatchRequest, delegate: Delegate) async throws {
 		if isAutomatching { return }
 		
 		isAutomatching = true
@@ -36,7 +36,7 @@ import GameKit
 			let match = try await GKMatchmaker.shared().findMatch(for: request)
 			let active = ActiveMatch(match: match, delegate: delegate)
 			self.activeMatch = active
-			delegate?.started(with: match.players, in: active)
+			delegate.loaded(match: active, with: match.players)
 			isAutomatching = false
 		} catch {
 			isAutomatching = false

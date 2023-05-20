@@ -12,7 +12,6 @@
 		B5D92ACA2A1834980009E8C7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B5D92AC92A1834980009E8C7 /* Assets.xcassets */; };
 		B5D92ACD2A1834980009E8C7 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B5D92ACC2A1834980009E8C7 /* Preview Assets.xcassets */; };
 		B5D92AD52A1839120009E8C7 /* TourneyKit in Frameworks */ = {isa = PBXBuildFile; productRef = B5D92AD42A1839120009E8C7 /* TourneyKit */; };
-		B5D92AD92A18636F0009E8C7 /* BasicControlPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D92AD82A18636F0009E8C7 /* BasicControlPanel.swift */; };
 		B5D92ADB2A1863900009E8C7 /* RPSGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D92ADA2A1863900009E8C7 /* RPSGame.swift */; };
 		B5D92ADD2A1865760009E8C7 /* RPSGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D92ADC2A1865760009E8C7 /* RPSGameView.swift */; };
 /* End PBXBuildFile section */
@@ -25,7 +24,6 @@
 		B5D92AC92A1834980009E8C7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B5D92ACC2A1834980009E8C7 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		B5D92AD72A1842680009E8C7 /* TourneyKitTestHarness.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TourneyKitTestHarness.entitlements; sourceTree = "<group>"; };
-		B5D92AD82A18636F0009E8C7 /* BasicControlPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicControlPanel.swift; sourceTree = "<group>"; };
 		B5D92ADA2A1863900009E8C7 /* RPSGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RPSGame.swift; sourceTree = "<group>"; };
 		B5D92ADC2A1865760009E8C7 /* RPSGameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RPSGameView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -65,7 +63,6 @@
 				B5D92AD72A1842680009E8C7 /* TourneyKitTestHarness.entitlements */,
 				B5D92AC52A1834970009E8C7 /* TourneyKitTestHarnessApp.swift */,
 				B5D92AC72A1834970009E8C7 /* ContentView.swift */,
-				B5D92AD82A18636F0009E8C7 /* BasicControlPanel.swift */,
 				B5D92ADA2A1863900009E8C7 /* RPSGame.swift */,
 				B5D92ADC2A1865760009E8C7 /* RPSGameView.swift */,
 				B5D92AC92A1834980009E8C7 /* Assets.xcassets */,
@@ -161,7 +158,6 @@
 				B5D92AC82A1834970009E8C7 /* ContentView.swift in Sources */,
 				B5D92AC62A1834970009E8C7 /* TourneyKitTestHarnessApp.swift in Sources */,
 				B5D92ADD2A1865760009E8C7 /* RPSGameView.swift in Sources */,
-				B5D92AD92A18636F0009E8C7 /* BasicControlPanel.swift in Sources */,
 				B5D92ADB2A1863900009E8C7 /* RPSGame.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

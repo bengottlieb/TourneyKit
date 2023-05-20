@@ -11,8 +11,6 @@ struct RPSGameView: View {
 	@ObservedObject var game: RPSGame
 	
 	var body: some View {
-		let _ = Self._printChanges()
-		
 		VStack {
 			ForEach(game.players, id: \.teamPlayerID) { player in
 				HStack {
@@ -24,6 +22,7 @@ struct RPSGameView: View {
 				game.endGame()
 			}
 		}
+		
 	}
 }
 //

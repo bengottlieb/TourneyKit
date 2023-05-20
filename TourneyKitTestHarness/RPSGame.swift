@@ -9,11 +9,12 @@ import Foundation
 import TourneyKit
 import GameKit
 
-class RPSGame: ActiveMatchDelegate, ObservableObject {
+final class RPSGame: ActiveMatchDelegate, ObservableObject {
+	
 	@Published var state: GameState = GameState(currentPlayerID: "")
 	@Published var players: [GKPlayer] = []
 	@Published var isStarted = false
-	var match: ActiveMatch?
+	var match: ActiveMatch<RPSGame>?
 	
 	struct GameState: Codable {
 		var currentPlayerID: String
@@ -25,7 +26,10 @@ class RPSGame: ActiveMatchDelegate, ObservableObject {
 		}
 	}
 	
-	func started(with players: [GKPlayer], in match: ActiveMatch) {
+	struct GameUpdate: Codable {
+	}
+	
+	func loaded(match: ActiveMatch<RPSGame>, with players: [GKPlayer]) {
 		self.players = players
 		self.isStarted = true
 		self.match = match
@@ -36,7 +40,7 @@ class RPSGame: ActiveMatchDelegate, ObservableObject {
 		isStarted = false
 	}
 	
-	func didReceive(data: Data, from player: GKPlayer, in match: ActiveMatch) {
+	func didReceive(data: Data, from player: GKPlayer) {
 		do {
 			state = try JSONDecoder().decode(GameState.self, from: data)
 		} catch {
@@ -44,15 +48,15 @@ class RPSGame: ActiveMatchDelegate, ObservableObject {
 		}
 	}
 	
-	func playersChanged(to players: [GKPlayer], in: ActiveMatch) {
+	func playersChanged(to players: [GKPlayer]) {
 		self.players = players
 	}
 	
-	func started(match: ActiveMatch) {
+	func startedMatch() {
 		isStarted = true
 	}
 	
-	func ended(match: ActiveMatch) {
+	func endedMatch() {
 		isStarted = false
 	}
 
