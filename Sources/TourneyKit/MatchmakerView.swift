@@ -8,19 +8,24 @@
 import SwiftUI
 import GameKit
 
-public struct MatchmakerView: UIViewControllerRepresentable {
+public struct MatchmakerView: UIViewControllerRepresentable, Identifiable {
 	@State var controller: GKMatchmakerViewController
+	@Binding var match: GKMatch?
+	public var id: NSObject { controller }
+	@Environment(\.dismiss) var dismiss
 	
-	init?(request: GKMatchRequest) {
+	public init?(request: GKMatchRequest, match: Binding<GKMatch?>) {
 		guard let cnt = GKMatchmakerViewController(matchRequest: request) else { return nil }
 		
 		_controller = State(initialValue: cnt)
+		_match = match
 	}
 	
-	init?(invite: GKInvite) {
+	public init?(invite: GKInvite, match: Binding<GKMatch?>) {
 		guard let cnt = GKMatchmakerViewController(invite: invite) else { return nil }
 		
 		_controller = State(initialValue: cnt)
+		_match = match
 	}
 	
 
@@ -29,6 +34,35 @@ public struct MatchmakerView: UIViewControllerRepresentable {
 	}
 	
 	public func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
+		
+	}
+	
+	public func makeCoordinator() -> Coordinator {
+		Coordinator(view: self)
+	}
+	
+	public class Coordinator: NSObject, GKMatchmakerViewControllerDelegate {
+		let view: MatchmakerView
+		
+		init(view: MatchmakerView) {
+			self.view = view
+			super.init()
+			view.controller.matchmakerDelegate = self
+		}
+
+		public func matchmakerViewControllerWasCancelled(_ viewController: GKMatchmakerViewController) {
+			view.dismiss()
+		}
+		
+		public func matchmakerViewController(_ viewController: GKMatchmakerViewController, didFind match: GKMatch) {
+			view.match = match
+			view.dismiss()
+		}
+
+		public func matchmakerViewController(_ viewController: GKMatchmakerViewController, didFailWithError error: Error) {
+			print("Error when matchmaking: \(error)")
+			view.dismiss()
+		}
 		
 	}
 }

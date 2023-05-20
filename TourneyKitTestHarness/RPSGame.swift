@@ -58,7 +58,9 @@ final class RPSGame: ActiveMatchDelegate, ObservableObject {
 	
 	func loaded(match: ActiveMatch<RPSGame>, with players: [GKPlayer]) {
 		self.match = match
+		self.players = players
 		self.isStarted = true
+		checkForReady()
 	}
 	
 	func matchPhaseChanged(to phase: ActiveMatchPhase, in match: ActiveMatch<RPSGame>) {

@@ -28,16 +28,20 @@ import GameKit
 		isAutomatching = false
 	}
 	
+	public func load<Delegate: ActiveMatchDelegate>(match: GKMatch, delegate: Delegate) {
+		let active = ActiveMatch(match: match, delegate: delegate)
+		self.activeMatch = active
+		delegate.loaded(match: active, with: active.allPlayers)
+		isAutomatching = false
+	}
+	
 	public func startAutomatching<Delegate: ActiveMatchDelegate>(request: GKMatchRequest, delegate: Delegate) async throws {
 		if isAutomatching { return }
 		
 		isAutomatching = true
 		do {
 			let match = try await GKMatchmaker.shared().findMatch(for: request)
-			let active = ActiveMatch(match: match, delegate: delegate)
-			self.activeMatch = active
-			delegate.loaded(match: active, with: match.players)
-			isAutomatching = false
+			load(match: match, delegate: delegate)
 		} catch {
 			isAutomatching = false
 			print("Failed to find match: \(error)")

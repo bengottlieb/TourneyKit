@@ -13,14 +13,19 @@ import GameKit
 struct ContentView: View {
 	@State var game = RPSGame()
 	@ObservedObject var mgr = MatchManager.instance
+	@State var matchView: MatchmakerView?
+	@State var match: GKMatch?
 
 	var body: some View {
 		VStack {
 			if game.isStarted {
 				RPSGameView(game: game)
 			} else {
+				Button("Search for Players") {
+					matchView = MatchmakerView(request: game.request, match: $match)
+				}
 				HStack {
-					Button(mgr.isAutomatching ? "Searching…" : "Start") { startGame() }
+					Button(mgr.isAutomatching ? "Searching…" : "Automatch") { startGame() }
 						.disabled(mgr.isAutomatching)
 					Button(action: cancelStart) {
 						Image(systemName: "x.circle.fill")
@@ -34,6 +39,14 @@ struct ContentView: View {
 		.onAppear {
 			mgr.authenticate()
 			DispatchQueue.main.asyncAfter(deadline: .now() + 2) { mgr.showingGameCenterAvatar = false }
+		}
+		.sheet(item: $matchView) { view in
+			view.edgesIgnoringSafeArea(.all)
+		}
+		.onChange(of: match) { newValue in
+			if let newValue {
+				mgr.load(match: newValue, delegate: game)
+			}
 		}
 	}
 	
