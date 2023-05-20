@@ -27,8 +27,8 @@ struct BasicControlPanel: View {
 			Button(action: stopMatching) { Text("Stop matching") }
 				.disabled(!mgr.isAutomatching)
 			
-			Button("Send Data") {
-				try! mgr.activeMatch?.send(data: "Test".data(using: .utf8)!)
+			Button("Start") {
+				try! mgr.activeMatch?.send(message: MessageMatchStart())
 			}
 			.disabled(!mgr.isInMatch)
 		}
