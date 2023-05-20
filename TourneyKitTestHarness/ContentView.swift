@@ -33,7 +33,7 @@ struct ContentView: View {
 		}
 		.onAppear {
 			mgr.authenticate()
-			DispatchQueue.main.asyncAfter(deadline: .now() + 1) { mgr.showingGameCenterAvatar = false }
+			DispatchQueue.main.asyncAfter(deadline: .now() + 2) { mgr.showingGameCenterAvatar = false }
 		}
 	}
 	

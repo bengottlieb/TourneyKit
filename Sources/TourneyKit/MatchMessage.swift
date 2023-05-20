@@ -11,18 +11,14 @@ import GameKit
 public protocol MatchMessage: Codable { }
 
 struct RawMessage: MatchMessage {
-	enum Kind: String, Codable { case start, end, state, update }
+	enum Kind: String, Codable { case phaseChange, state, update }
 	let kind: Kind
 }
 
-public struct MessageMatchStart: MatchMessage {
-	var kind = RawMessage.Kind.start
-	public init() { }
-}
-
-public struct MessageMatchEnd: MatchMessage {
-	var kind = RawMessage.Kind.end
-	public init() { }
+public struct MessageMatchPhaseChange: MatchMessage {
+	var kind = RawMessage.Kind.phaseChange
+	var phase: ActiveMatchPhase
+	public init(_ phase: ActiveMatchPhase) { self.phase = phase }
 }
 
 public struct MessageMatchState<Payload: Codable>: MatchMessage {

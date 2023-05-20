@@ -10,21 +10,11 @@ import GameKit
 
 public protocol SomeMatch: AnyObject { }
 
-public protocol ActiveMatchDelegate {
-	associatedtype GameState: Codable
-	associatedtype GameUpdate: Codable
-	
-	func didReceive(data: Data, from player: GKPlayer)
-	func loaded(match: ActiveMatch<Self>, with players: [GKPlayer])
-	func playersChanged(to players: [GKPlayer])
-	
-	func startedMatch()
-	func endedMatch()
-}
 
 public class ActiveMatch<Delegate: ActiveMatchDelegate>: NSObject, ObservableObject, GKMatchDelegate, SomeMatch {
 	public let match: GKMatch
 	public var delegate: Delegate?
+	public private(set) var phase: ActiveMatchPhase = .loading
 	@Published public var recentlyReceivedData: [MatchMessage] = []
 	var recentDataDepth = 5
 	@Published public var recentErrors: [Error] = []
@@ -39,10 +29,15 @@ public class ActiveMatch<Delegate: ActiveMatchDelegate>: NSObject, ObservableObj
 	}
 	
 	public func startMatch() {
-		try? send(message: MessageMatchStart())
+		self.phase = .playing
+		sendPhaseChangedMessage()
 	}
 	
-	func endMatchLocally() {
+	func sendPhaseChangedMessage() {
+		try? send(message: MessageMatchPhaseChange(phase))
+	}
+	
+	func terminateLocally() {
 		Task {
 			await MainActor.run {
 				if MatchManager.instance.activeMatch === self {
@@ -54,29 +49,16 @@ public class ActiveMatch<Delegate: ActiveMatchDelegate>: NSObject, ObservableObj
 	}
 	
 	public func endMatch() {
-		try? send(message: MessageMatchEnd())
-		endMatchLocally()
+		phase = .ended
+		sendPhaseChangedMessage()
 	}
 	
-	func sendUpdate(_ update: Delegate.GameUpdate, reliably: Bool = true) throws {
-		try send(message: MessageMatchUpdate(update), reliably: reliably)
-	}
-	
-	func sendState(_ state: Delegate.GameState, reliably: Bool = true) throws {
-		try send(message: MessageMatchState(state), reliably: reliably)
-	}
-	
-	func send<Message: MatchMessage>(message: Message, reliably: Bool = true) throws {
-		let data = try JSONEncoder().encode(message)
-		do {
-			try send(data: data, reliably: reliably)
-		} catch {
-			recentErrors.append(error)
-			throw error
-		}
+	public func terminate() {
+		terminateLocally()
 	}
 	
 	func send(data: Data, reliably: Bool = true) throws {
+		print("Sending: \(String(data: data, encoding: .utf8) ?? "something")")
 		try match.sendData(toAllPlayers: data, with: reliably ? .reliable : .unreliable)
 	}
 
@@ -93,27 +75,16 @@ public class ActiveMatch<Delegate: ActiveMatchDelegate>: NSObject, ObservableObj
 	}
 
 	public func match(_ match: GKMatch, didReceive data: Data, fromRemotePlayer player: GKPlayer) {
-		do {
-			let raw = try JSONDecoder().decode(RawMessage.self, from: data)
-			
-			switch raw.kind {
-			case .start: delegate?.startedMatch()
-			case .end:
-				delegate?.endedMatch()
-				endMatchLocally()
-				
-			default: break
-			}
-		} catch {
-			recentErrors.append(error)
-			print("Failed to process a message: \(String(data: data, encoding: .utf8) ?? "--")")
-		}
+		print("received: \(String(data: data, encoding: .utf8) ?? "something")")
+		handleIncoming(data: data, from: player)
 	}
-}
-
-extension ActiveMatch {
-	public struct ReceivedData {
-		let receivedAt = Date()
-		let data: Data
+	
+	func handleRemotePhaseChange(to newPhase: ActiveMatchPhase) {
+		if self.phase == newPhase { return }
+		self.phase = newPhase
+		
+		Task {
+			await MainActor.run { delegate?.matchPhaseChanged(to: newPhase, in: self) }
+		}
 	}
 }

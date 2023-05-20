@@ -18,27 +18,69 @@ final class RPSGame: ActiveMatchDelegate, ObservableObject {
 	
 	struct GameState: Codable {
 		var currentPlayerID: String
+		var playerCount = 0
 		var moves: [Move] = []
 		
-		struct Move: Codable {
-			let player: String
-			let move: String
+		var localPlayerID: String { GKLocalPlayer.local.teamPlayerID }
+		
+		var hasMovedThisTurn: Bool {
+			guard let recentMove = moves.last else { return false }
+			if recentMove.moves.count == playerCount { return false }
+			return recentMove.moves[localPlayerID] != nil
 		}
+		
+		mutating func addMove(_ move: String) {
+			if hasMovedThisTurn { return }
+			
+			if let recentMove = moves.last, recentMove.moves[localPlayerID] == nil {
+				moves[moves.count - 1].moves[localPlayerID] = move
+			} else {
+				moves.append(.init(moves: [localPlayerID: move]))
+			}
+		}
+		
+		struct Move: Codable {
+			var moves: [String: String] = [:]
+		}
+	}
+	
+	var canMove: Bool { !state.hasMovedThisTurn }
+	
+	func makeMove(_ move: String) {
+		state.addMove(move)
+		try? match?.sendState(state)
 	}
 	
 	struct GameUpdate: Codable {
 	}
 	
 	func loaded(match: ActiveMatch<RPSGame>, with players: [GKPlayer]) {
-		self.players = players
-		self.isStarted = true
 		self.match = match
+		self.isStarted = true
 	}
+	
+	func matchPhaseChanged(to phase: ActiveMatchPhase, in match: ActiveMatch<RPSGame>) {
+		objectWillChange.send()
+
+		switch phase {
+		case .loaded:
+			break
+
+		case .playing:
+			isStarted = true
+			
+		case .ended:
+			isStarted = false
+			
+		default: break
+		}
+	}
+	
 	
 	@MainActor func endGame() {
 		match?.endMatch()
-		isStarted = false
 	}
+
 	
 	func didReceive(data: Data, from player: GKPlayer) {
 		do {
@@ -50,14 +92,20 @@ final class RPSGame: ActiveMatchDelegate, ObservableObject {
 	
 	func playersChanged(to players: [GKPlayer]) {
 		self.players = players
+		state.playerCount = players.count
 	}
 	
-	func startedMatch() {
-		isStarted = true
+	func matchStateChanged(to state: GameState) {
+		self.state = state
 	}
-	
+
+	func matchUpdated(with update: GameUpdate) {
+		
+	}
+
 	func endedMatch() {
 		isStarted = false
+		match?.terminate()
 	}
 
 	var request: GKMatchRequest {
