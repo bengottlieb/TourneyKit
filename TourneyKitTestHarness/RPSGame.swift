@@ -21,7 +21,7 @@ final class RPSGame: ActiveMatchDelegate, ObservableObject {
 		var playerCount = 0
 		var moves: [Move] = []
 		
-		var localPlayerID: String { GKLocalPlayer.local.teamPlayerID }
+		var localPlayerID: String { GKLocalPlayer.local.gamePlayerID }
 		
 		var hasMovedThisTurn: Bool {
 			guard let recentMove = moves.last else { return false }
@@ -44,7 +44,9 @@ final class RPSGame: ActiveMatchDelegate, ObservableObject {
 		}
 	}
 	
-	var canMove: Bool { !state.hasMovedThisTurn }
+	var canMove: Bool {
+		match?.phase == .playing && !state.hasMovedThisTurn
+	}
 	
 	func makeMove(_ move: String) {
 		state.addMove(move)
@@ -63,7 +65,7 @@ final class RPSGame: ActiveMatchDelegate, ObservableObject {
 		objectWillChange.send()
 
 		switch phase {
-		case .loaded:
+		case .loading:
 			break
 
 		case .playing:
@@ -71,8 +73,6 @@ final class RPSGame: ActiveMatchDelegate, ObservableObject {
 			
 		case .ended:
 			isStarted = false
-			
-		default: break
 		}
 	}
 	
@@ -100,6 +100,13 @@ final class RPSGame: ActiveMatchDelegate, ObservableObject {
 	func playersChanged(to players: [GKPlayer]) {
 		self.players = players
 		state.playerCount = players.count
+		checkForReady()
+	}
+	
+	func checkForReady() {
+		if players.count == 2, match?.phase == .loading {
+			match?.startMatch()
+		}
 	}
 	
 	func matchStateChanged(to state: GameState) {

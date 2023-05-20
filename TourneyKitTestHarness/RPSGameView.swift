@@ -13,16 +13,23 @@ struct RPSGameView: View {
 	var body: some View {
 		VStack {
 			Text(game.match?.phase.title ?? "--")
-			ForEach(game.players, id: \.teamPlayerID) { player in
+			ForEach(game.players, id: \.gamePlayerID) { player in
 				HStack {
 					Text(player.displayName)
 				}
 			}
 
-			ForEach(game.state.moves.indices, id: \.self) { idx in
+			let allMoves = game.state.moves
+			let sortedPlayers = game.players.sorted { $0.displayName < $1.displayName }
+			ForEach(allMoves.indices, id: \.self) { idx in
 				let move = game.state.moves[idx]
 				HStack {
-					Text(move.moves.values.joined(separator: ", "))
+					ForEach(sortedPlayers, id: \.gamePlayerID) { player in
+						Text(player.displayName)
+						if let move = move.moves[player.gamePlayerID] {
+							Text(move)
+						}
+					}
 				}
 			}
 
@@ -44,7 +51,10 @@ struct RPSGameView: View {
 				}
 			}
 		}
-		
+	}
+	
+	func name(for playerID: String) -> String? {
+		game.players.first { $0.gamePlayerID == playerID }?.displayName
 	}
 	
 	func move(_ move: String) {

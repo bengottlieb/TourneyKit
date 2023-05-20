@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  ActiveMatchDelegate.swift
 //  
 //
 //  Created by Ben Gottlieb on 5/20/23.
@@ -21,7 +21,7 @@ public protocol ActiveMatchDelegate {
 	func matchPhaseChanged(to phase: ActiveMatchPhase, in match: ActiveMatch<Self>)
 }
 
-public enum ActiveMatchPhase: String, Codable { case loading, loaded, playing, ended
+public enum ActiveMatchPhase: String, Codable { case loading, playing, ended
 	public var title: String {
 		rawValue
 	}
