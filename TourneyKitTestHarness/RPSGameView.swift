@@ -38,7 +38,7 @@ struct RPSGameView: View {
 			Spacer()
 			Button(game.match?.phase == .ended ? "Done" : "End Game") {
 				if game.match?.phase == .ended {
-					game.match?.terminate()
+					game.terminateGame()
 				} else {
 					game.endGame()
 				}

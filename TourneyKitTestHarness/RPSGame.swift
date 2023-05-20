@@ -78,7 +78,14 @@ final class RPSGame: ActiveMatchDelegate, ObservableObject {
 	
 	
 	@MainActor func endGame() {
+		objectWillChange.send()
 		match?.endMatch()
+	}
+
+	@MainActor func terminateGame() {
+		objectWillChange.send()
+		isStarted = false
+		match?.terminate()
 	}
 
 	
