@@ -63,6 +63,7 @@ public class ActiveMatch<Delegate: ActiveMatchDelegate>: NSObject, ObservableObj
 	}
 
 	public func match(_ match: GKMatch, player: GKPlayer, didChange state: GKPlayerConnectionState) {
+		print("Update from \(player)")
 		Task {
 			await MainActor.run {
 				self.delegate?.playersChanged(to: allPlayers)

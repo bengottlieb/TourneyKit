@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import TourneyKit
 
 struct RPSGameView: View {
 	@ObservedObject var game: RPSGame
@@ -15,7 +16,7 @@ struct RPSGameView: View {
 			Text(game.match?.phase.title ?? "--")
 			ForEach(game.players, id: \.tourneyKitID) { player in
 				HStack {
-					Text(player.displayName)
+					PlayerLabel(player: player)
 				}
 			}
 
