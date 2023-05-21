@@ -21,7 +21,7 @@ final class RPSGame: ActiveMatchDelegate, ObservableObject {
 		var playerCount = 0
 		var moves: [Move] = []
 		
-		var localPlayerID: String { GKLocalPlayer.local.gamePlayerID }
+		var localPlayerID: String { GKLocalPlayer.local.tourneyKitID }
 		
 		var hasMovedThisTurn: Bool {
 			guard let recentMove = moves.last else { return false }
