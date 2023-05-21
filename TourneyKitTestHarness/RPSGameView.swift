@@ -10,12 +10,13 @@ import TourneyKit
 
 struct RPSGameView: View {
 	@ObservedObject var game: RPSGame
-	
+	@State var showLog = false
 	var body: some View {
 		ZStack {
 			VStack {
 				Text(game.match?.phase.title ?? "--")
-				ForEach(game.players, id: \.tourneyKitID) { player in
+				ForEach(game.players.indices, id: \.self) { idx in
+					let player = game.players[idx]
 					HStack {
 						PlayerLabel(player: player)
 					}
@@ -26,12 +27,17 @@ struct RPSGameView: View {
 				ForEach(allMoves.indices, id: \.self) { idx in
 					let move = game.state.moves[idx]
 					HStack {
-						ForEach(sortedPlayers, id: \.tourneyKitID) { player in
+						ForEach(sortedPlayers.indices, id: \.self) { idx in
+							let player = sortedPlayers[idx]
 							Text(player.displayName)
-							if let move = move.moves[player.tourneyKitID] {
+							if let tourneyKitID = player.tourneyKitID, let move = move.moves[tourneyKitID] {
 								Text(move)
 							}
 						}
+						Rectangle()
+							.fill(Color.gray)
+							.frame(height: 1)
+						
 					}
 				}
 				
@@ -45,23 +51,31 @@ struct RPSGameView: View {
 				.opacity(game.canMove ? 1 : 0.25)
 				
 				Spacer()
-				Button(game.match?.phase == .ended ? "Done" : "End Game") {
-					if game.match?.phase == .ended {
-						game.terminateGame()
-					} else {
-						game.endGame()
+				HStack {
+					Button(game.match?.phase == .ended ? "Done" : "End Game") {
+						if game.match?.phase == .ended {
+							game.terminateGame()
+						} else {
+							game.endGame()
+						}
 					}
+					Spacer()
+					Button("🐞") { showLog.toggle() }
 				}
+				.padding(.horizontal)
 			}
 			
-			VStack {
-				Rectangle().fill(Color.clear)
-				Rectangle().fill(Color.clear)
-					.background {
-						LoggerView()
-							.opacity(0.7)
-					}
-					.padding(.bottom, 30)
+			if showLog {
+				VStack {
+					Rectangle().fill(Color.clear)
+					Rectangle().fill(Color.clear)
+						.background {
+							LoggerView()
+								.opacity(0.7)
+						}
+						.padding(.horizontal)
+						.padding(.bottom, 30)
+				}
 			}
 		}
 	}

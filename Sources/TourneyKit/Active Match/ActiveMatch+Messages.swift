@@ -16,17 +16,26 @@ extension ActiveMatch {
 			switch raw.kind {
 			case .phaseChange:
 				if let full = try? JSONDecoder().decode(MessageMatchPhaseChange.self, from: data) {
+					Logger.instance.log(.matchPhaseChange(match, full.phase))
 					handleRemotePhaseChange(to: full.phase)
 				}
 				
 			case .state:
 				if let full = try? JSONDecoder().decode(MessageMatchState<Delegate.GameState>.self, from: data) {
+					Logger.instance.log(.matchStateReceived(match, data))
 					delegate?.matchStateChanged(to: full.payload)
 				}
 				
 			case .update:
 				if let full = try? JSONDecoder().decode(MessageMatchState<Delegate.GameUpdate>.self, from: data) {
+					Logger.instance.log(.matchUpateReceived(match, data))
 					delegate?.matchUpdated(with: full.payload)
+				}
+				
+			case .playerInfo:
+				if let full = try? JSONDecoder().decode(MessagePlayerInfo.self, from: data) {
+					Logger.instance.log(.playerInfoReceived(match, player, full.name, full.id))
+					PlayerCache.instance.set(name: full.name, id: full.id, for: player)
 				}
 			}
 		} catch {

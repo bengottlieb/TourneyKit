@@ -33,6 +33,10 @@ public class ActiveMatch<Delegate: ActiveMatchDelegate>: NSObject, ObservableObj
 		sendPhaseChangedMessage()
 	}
 	
+	func sendPlayerInfo(for player: GKPlayer = GKLocalPlayer.local) {
+		try? send(message: MessagePlayerInfo(player), reliably: true)
+	}
+	
 	func sendPhaseChangedMessage() {
 		try? send(message: MessageMatchPhaseChange(phase))
 	}
@@ -64,6 +68,7 @@ public class ActiveMatch<Delegate: ActiveMatchDelegate>: NSObject, ObservableObj
 
 	public func match(_ match: GKMatch, player: GKPlayer, didChange state: GKPlayerConnectionState) {
 		Logger.instance.log(.matchChangedPlayerState(match, player, state))
+		if state == .connected { sendPlayerInfo() }
 		Task {
 			await MainActor.run {
 				self.delegate?.playersChanged(to: allPlayers)

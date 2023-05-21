@@ -31,7 +31,7 @@ public struct PlayerInfoView: View {
 			}
 			
 			Text("Alias: " + player.alias)
-			Text("TourneyKit ID: " + player.tourneyKitID)
+			Text("TourneyKit ID: " + (player.tourneyKitID ?? "--"))
 			Text("Game ID: " + player.gamePlayerID)
 			Text("Team ID: " + player.teamPlayerID)
 			Text("Guest ID: " + (player.guestIdentifier ?? "--"))

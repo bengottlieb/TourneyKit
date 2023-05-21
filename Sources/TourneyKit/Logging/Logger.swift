@@ -13,7 +13,7 @@ extension GKPlayer {
 		var result = displayName
 		if teamPlayerID.contains(":") { result += ", " + teamPlayerID }
 		if gamePlayerID.contains(":") { result += ", " + gamePlayerID }
-		result += ", " + tourneyKitID
+		if let id = tourneyKitID { result += ", " + id }
 		return result
 	}
 }
@@ -47,6 +47,7 @@ public class Logger: ObservableObject {
 		case playerDidModifySavedGame(GKSavedGame), playerHasConflictingSavedGames(GKPlayer, [GKSavedGame])
 		case playerWantsToPlay(GKPlayer, GKChallenge), playerDidReceiveChallenge(GKPlayer, GKChallenge), playerDidCompleteChallenge(GKPlayer, GKChallenge), playerIssuedChallengeWasCompleted(GKPlayer, GKChallenge, GKPlayer)
 		case didRequestMatch([GKPlayer]), receivedTurnEvent(GKPlayer, GKTurnBasedMatch), matchEnded(GKTurnBasedMatch), receivedExchangeRequest(GKTurnBasedExchange, GKTurnBasedMatch), receivedExchangeCancellation(GKTurnBasedExchange, GKTurnBasedMatch), receivedExchangeReplies([GKTurnBasedExchangeReply], GKTurnBasedExchange, GKTurnBasedMatch), wantsToQuitMatch(GKPlayer, GKTurnBasedMatch)
+		case matchPhaseChange(GKMatch, ActiveMatchPhase), matchStateReceived(GKMatch, Data), matchUpateReceived(GKMatch, Data), playerInfoReceived(GKMatch, GKPlayer, String, String)
 		
 		var description: String {
 			switch self {
@@ -89,6 +90,15 @@ public class Logger: ObservableObject {
 				return "receivedExchangeReplies"
 			case .wantsToQuitMatch(_, _):
 				return "wantsToQuitMatch"
+				
+			case .matchPhaseChange(_, let phase):
+				return "matchPhaseChanged to \(phase)"
+			case .matchStateReceived(_, let data):
+				return "matchStateReceived: \(data.count) bytes"
+			case .matchUpateReceived(_, let data):
+				return "matchUpateReceived: \(data.count) bytes"
+			case .playerInfoReceived(_, _, let name, let id):
+				return "playerInfoReceived: \(name), \(id)"
 			}
 		}
 	}

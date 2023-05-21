@@ -29,16 +29,7 @@ extension MatchManager: GKLocalPlayerListener {
 				return
 			}
 			
-			// A value of nil for viewController indicates successful authentication, and you can access
-			// local player properties.
-			
-			// Load the local player's avatar.
-			GKLocalPlayer.local.loadPhoto(for: GKPlayer.PhotoSize.small) { image, error in
-				if let error {
-					// Handle an error if it occurs.
-					print("Error: \(error.localizedDescription).")
-				}
-			}
+			PlayerCache.instance.set(name: GKLocalPlayer.local.displayName, id: GKLocalPlayer.local.teamPlayerID, for: GKLocalPlayer.local)
 			
 			// Register for real-time invitations from other players.
 			GKLocalPlayer.local.register(self)

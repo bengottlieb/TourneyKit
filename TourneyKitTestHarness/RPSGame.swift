@@ -21,16 +21,16 @@ final class RPSGame: ActiveMatchDelegate, ObservableObject {
 		var playerCount = 0
 		var moves: [Move] = []
 		
-		var localPlayerID: String { GKLocalPlayer.local.tourneyKitID }
+		var localPlayerID: String? { GKLocalPlayer.local.tourneyKitID }
 		
 		var hasMovedThisTurn: Bool {
-			guard let recentMove = moves.last else { return false }
+			guard let recentMove = moves.last, let localPlayerID else { return false }
 			if recentMove.moves.count == playerCount { return false }
 			return recentMove.moves[localPlayerID] != nil
 		}
 		
 		mutating func addMove(_ move: String) {
-			if hasMovedThisTurn { return }
+			guard !hasMovedThisTurn, let localPlayerID else { return }
 			
 			if let recentMove = moves.last, recentMove.moves[localPlayerID] == nil {
 				moves[moves.count - 1].moves[localPlayerID] = move

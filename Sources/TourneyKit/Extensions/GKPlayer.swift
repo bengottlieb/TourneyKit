@@ -8,7 +8,7 @@
 import GameKit
 
 public extension GKPlayer {
-	var tourneyKitID: String {
-		playerID
+	var tourneyKitID: String? {
+		PlayerCache.instance.id(for: self)
 	}
 }

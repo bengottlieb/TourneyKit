@@ -21,7 +21,7 @@ struct ContentView: View {
 			if game.isStarted {
 				RPSGameView(game: game)
 			} else {
-				Text("\(GKLocalPlayer.local.displayName) - \(GKLocalPlayer.local.tourneyKitID)")
+				Text("\(GKLocalPlayer.local.displayName) - \(GKLocalPlayer.local.tourneyKitID ?? "--")")
 				Spacer()
 				Button("Search for Players") {
 					matchView = MatchmakerView(request: game.request, match: $match)
