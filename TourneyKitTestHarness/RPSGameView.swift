@@ -34,11 +34,11 @@ struct RPSGameView: View {
 								Text(move)
 							}
 						}
-						Rectangle()
-							.fill(Color.gray)
-							.frame(height: 1)
 						
 					}
+					Rectangle()
+						.fill(Color.gray)
+						.frame(height: 1)
 				}
 				
 				HStack {

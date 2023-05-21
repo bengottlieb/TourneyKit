@@ -18,12 +18,13 @@ public struct LoggerView: View {
 				ForEach(logger.messages.indices, id: \.self) { idx in
 					let text = logger.messages[idx].description
 					Text(text)
-						.id(text)
+						.foregroundColor(.white)
 				}
 				.id(logger.lastMessageAt)
 			}
 			.font(.system(size: 12).monospaced())
-			
+			.padding(4)
+			.background(Color.black)
 		}
 	}
 }
