@@ -63,8 +63,7 @@ public class ActiveMatch<Delegate: ActiveMatchDelegate>: NSObject, ObservableObj
 	}
 
 	public func match(_ match: GKMatch, player: GKPlayer, didChange state: GKPlayerConnectionState) {
-		TourneyKitLogger.instance.log(.matchChangedPlayerState(match, player, state))
-		print("Update from \(player)")
+		Logger.instance.log(.matchChangedPlayerState(match, player, state))
 		Task {
 			await MainActor.run {
 				self.delegate?.playersChanged(to: allPlayers)
@@ -73,12 +72,12 @@ public class ActiveMatch<Delegate: ActiveMatchDelegate>: NSObject, ObservableObj
 	}
 	
 	public func match(_ match: GKMatch, shouldReinviteDisconnectedPlayer player: GKPlayer) -> Bool {
-		TourneyKitLogger.instance.log(.matchShouldReinviteDisconnectedPlayer(match, player))
+		Logger.instance.log(.matchShouldReinviteDisconnectedPlayer(match, player))
 		 return true
 	}
 
 	public func match(_ match: GKMatch, didReceive data: Data, forRecipient recipient: GKPlayer, fromRemotePlayer player: GKPlayer) {
-		TourneyKitLogger.instance.log(.matchReceivedData(match, player, data))
+		Logger.instance.log(.matchReceivedData(match, player, data))
 		handleIncoming(data: data, from: player)
 	}
 	

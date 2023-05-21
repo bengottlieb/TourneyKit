@@ -1,5 +1,5 @@
 //
-//  TourneyKitLogger.swift
+//  Logger.swift
 //  
 //
 //  Created by Ben Gottlieb on 5/21/23.
@@ -8,10 +8,36 @@
 import Foundation
 import GameKit
 
-public class TourneyKitLogger: ObservableObject {
-	public static let instance = TourneyKitLogger()
+extension GKPlayer {
+	var shortDescription: String {
+		var result = displayName
+		if teamPlayerID.contains(":") { result += ", " + teamPlayerID }
+		if gamePlayerID.contains(":") { result += ", " + gamePlayerID }
+		result += ", " + tourneyKitID
+		return result
+	}
+}
+
+public class Logger: ObservableObject {
+	public static let instance = Logger()
+	var lastMessageAt = Date()
 	
-	func log(_ message: Message) { print("🎮 \(message.description)") }
+	#if targetEnvironment(simulator)
+		public var logMessages = true
+	#else
+		public var logMessages = true
+	#endif
+	public var logDepth = 20
+	
+	var messages: [Message] = []
+	
+	func log(_ message: Message) {
+		messages.append(message)
+		while messages.count > logDepth { messages.remove(at: 0) }
+		if logMessages { print("🎮 \(message.description)") }
+		lastMessageAt = Date()
+		DispatchQueue.main.async { self.objectWillChange.send() }
+	}
 	
 	enum Message: CustomStringConvertible {
 		case matchReceivedData(GKMatch, GKPlayer, Data), matchChangedPlayerState(GKMatch, GKPlayer, GKPlayerConnectionState), matchFailedWithError(Error), matchShouldReinviteDisconnectedPlayer(GKMatch, GKPlayer)
@@ -25,18 +51,18 @@ public class TourneyKitLogger: ObservableObject {
 		var description: String {
 			switch self {
 				
-			case .matchReceivedData(_, let player, _):
-				return "matchReceivedData from \(player.displayName)"
+			case .matchReceivedData(_, let player, let data):
+				return "matchReceivedData \(data.count) bytes from \(player.shortDescription)"
 			case .matchChangedPlayerState(_, let player, let state):
-				return "matchChangedPlayerState from \(player.displayName), \(state.rawValue)"
+				return "matchChangedPlayerState for \(player.shortDescription): \(state)"
 			case .matchFailedWithError(let error):
 				return "matchFailedWithError \(error.localizedDescription)"
 			case .matchShouldReinviteDisconnectedPlayer(_, let player):
-				return "matchShouldReinviteDisconnectedPlayer \(player.displayName)"
+				return "matchShouldReinviteDisconnectedPlayer \(player.shortDescription)"
 			case .playerAccept(let player, _):
-				return "player accepted \(player.displayName)"
+				return "player accepted \(player.shortDescription)"
 			case .playerRequestMatch(let players):
-				return "playerRequestMatch \(players.map { $0.displayName }.joined(separator: ", "))"
+				return "playerRequestMatch \(players.map { $0.shortDescription }.joined(separator: ", "))"
 			case .playerDidModifySavedGame(_):
 				return "playerDidModifySavedGame"
 			case .playerHasConflictingSavedGames(_, _):
