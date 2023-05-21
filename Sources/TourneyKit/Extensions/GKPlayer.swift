@@ -9,6 +9,6 @@ import GameKit
 
 public extension GKPlayer {
 	var tourneyKitID: String {
-		teamPlayerID
+		playerID
 	}
 }
