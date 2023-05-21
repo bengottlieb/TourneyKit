@@ -25,7 +25,7 @@
 		B5D92AD72A1842680009E8C7 /* TourneyKitTestHarness.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TourneyKitTestHarness.entitlements; sourceTree = "<group>"; };
 		B5D92ADA2A1863900009E8C7 /* RPSGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RPSGame.swift; sourceTree = "<group>"; };
 		B5D92ADC2A1865760009E8C7 /* RPSGameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RPSGameView.swift; sourceTree = "<group>"; };
-		B5D92ADF2A19BBF50009E8C7 /* TourneyKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = TourneyKit; sourceTree = "<group>"; };
+		B5EE2DC42A1A580B00455156 /* TourneyKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = TourneyKit; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -43,7 +43,7 @@
 		B5D92AB92A1834970009E8C7 = {
 			isa = PBXGroup;
 			children = (
-				B5D92ADF2A19BBF50009E8C7 /* TourneyKit */,
+				B5EE2DC42A1A580B00455156 /* TourneyKit */,
 				B5D92AC42A1834970009E8C7 /* TourneyKitTestHarness */,
 				B5D92AC32A1834970009E8C7 /* Products */,
 			);

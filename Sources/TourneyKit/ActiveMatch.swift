@@ -58,11 +58,12 @@ public class ActiveMatch<Delegate: ActiveMatchDelegate>: NSObject, ObservableObj
 	}
 	
 	func send(data: Data, reliably: Bool = true) throws {
-		print("Sending: \(String(data: data, encoding: .utf8) ?? "something")")
+//		print("Sending: \(String(data: data, encoding: .utf8) ?? "something")")
 		try match.sendData(toAllPlayers: data, with: reliably ? .reliable : .unreliable)
 	}
 
 	public func match(_ match: GKMatch, player: GKPlayer, didChange state: GKPlayerConnectionState) {
+		TourneyKitLogger.instance.log(.matchChangedPlayerState(match, player, state))
 		print("Update from \(player)")
 		Task {
 			await MainActor.run {
@@ -72,11 +73,12 @@ public class ActiveMatch<Delegate: ActiveMatchDelegate>: NSObject, ObservableObj
 	}
 	
 	public func match(_ match: GKMatch, shouldReinviteDisconnectedPlayer player: GKPlayer) -> Bool {
+		TourneyKitLogger.instance.log(.matchShouldReinviteDisconnectedPlayer(match, player))
 		 return true
 	}
 
-	public func match(_ match: GKMatch, didReceive data: Data, fromRemotePlayer player: GKPlayer) {
-		print("received: \(String(data: data, encoding: .utf8) ?? "something")")
+	public func match(_ match: GKMatch, didReceive data: Data, forRecipient recipient: GKPlayer, fromRemotePlayer player: GKPlayer) {
+		TourneyKitLogger.instance.log(.matchReceivedData(match, player, data))
 		handleIncoming(data: data, from: player)
 	}
 	
