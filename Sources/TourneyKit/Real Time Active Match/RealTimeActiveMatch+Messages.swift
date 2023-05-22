@@ -8,7 +8,7 @@
 import Foundation
 import GameKit
 
-extension ActiveMatch {
+extension RealTimeActiveMatch {
 	func handleIncoming(data: Data, from player: GKPlayer) {
 		do {
 			let raw = try JSONDecoder().decode(RawMessage.self, from: data)

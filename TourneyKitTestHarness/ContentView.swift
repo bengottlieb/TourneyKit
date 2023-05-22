@@ -13,7 +13,7 @@ import GameKit
 struct ContentView: View {
 	@State var game = RPSGame()
 	@ObservedObject var mgr = MatchManager.instance
-	@State var matchView: MatchmakerView?
+	@State var matchView: RealTimeMatchmakerView?
 	@State var match: GKMatch?
 
 	var body: some View {
@@ -24,7 +24,7 @@ struct ContentView: View {
 				Text("\(GKLocalPlayer.local.displayName) - \(GKLocalPlayer.local.tourneyKitID ?? "--")")
 				Spacer()
 				Button("Search for Players") {
-					matchView = MatchmakerView(request: game.request, match: $match)
+					matchView = RealTimeMatchmakerView(request: game.request, match: $match)
 				}
 				HStack {
 					Button(mgr.isAutomatching ? "Searching…" : "Automatch") { startGame() }

@@ -8,7 +8,7 @@
 import SwiftUI
 import GameKit
 
-public struct MatchmakerView: UIViewControllerRepresentable, Identifiable {
+public struct RealTimeMatchmakerView: UIViewControllerRepresentable, Identifiable {
 	@State var controller: GKMatchmakerViewController
 	@Binding var match: GKMatch?
 	public var id: NSObject { controller }
@@ -42,9 +42,9 @@ public struct MatchmakerView: UIViewControllerRepresentable, Identifiable {
 	}
 	
 	public class Coordinator: NSObject, GKMatchmakerViewControllerDelegate {
-		let view: MatchmakerView
+		let view: RealTimeMatchmakerView
 		
-		init(view: MatchmakerView) {
+		init(view: RealTimeMatchmakerView) {
 			self.view = view
 			super.init()
 			view.controller.matchmakerDelegate = self

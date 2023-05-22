@@ -11,7 +11,7 @@ import GameKit
 public protocol SomeMatch: AnyObject { }
 
 
-public class ActiveMatch<Delegate: ActiveMatchDelegate>: NSObject, ObservableObject, GKMatchDelegate, SomeMatch {
+public class RealTimeActiveMatch<Delegate: RealTimeActiveMatchDelegate>: NSObject, ObservableObject, GKMatchDelegate, SomeMatch {
 	public let match: GKMatch
 	public var delegate: Delegate?
 	public private(set) var phase: ActiveMatchPhase = .loading
@@ -44,8 +44,8 @@ public class ActiveMatch<Delegate: ActiveMatchDelegate>: NSObject, ObservableObj
 	func terminateLocally() {
 		Task {
 			await MainActor.run {
-				if MatchManager.instance.activeMatch === self {
-					MatchManager.instance.activeMatch = nil
+				if MatchManager.instance.realTimeActiveMatch === self {
+					MatchManager.instance.realTimeActiveMatch = nil
 				}
 			}
 		}

@@ -14,8 +14,8 @@ import GameKit
 	@Published public var isAuthenticated = false
 	@Published public var isAutomatching = false
 
-	@Published public var activeMatch: SomeMatch?
-	public var isInMatch: Bool { activeMatch != nil }
+	@Published public var realTimeActiveMatch: SomeMatch?
+	public var isInRealTimeMatch: Bool { realTimeActiveMatch != nil }
 	
 	override private init() {
 		super.init()
@@ -28,14 +28,14 @@ import GameKit
 		isAutomatching = false
 	}
 	
-	public func load<Delegate: ActiveMatchDelegate>(match: GKMatch, delegate: Delegate) {
-		let active = ActiveMatch(match: match, delegate: delegate)
-		self.activeMatch = active
+	public func load<Delegate: RealTimeActiveMatchDelegate>(match: GKMatch, delegate: Delegate) {
+		let active = RealTimeActiveMatch(match: match, delegate: delegate)
+		self.realTimeActiveMatch = active
 		delegate.loaded(match: active, with: active.allPlayers)
 		isAutomatching = false
 	}
 	
-	public func startAutomatching<Delegate: ActiveMatchDelegate>(request: GKMatchRequest, delegate: Delegate) async throws {
+	public func startAutomatching<Delegate: RealTimeActiveMatchDelegate>(request: GKMatchRequest, delegate: Delegate) async throws {
 		if isAutomatching { return }
 		
 		isAutomatching = true
