@@ -15,7 +15,6 @@ public protocol SomeTurnBasedActiveMatch: SomeMatch {
 	func player(_ player: GKPlayer, receivedExchangeCancellation exchange: GKTurnBasedExchange)
 	func player(_ player: GKPlayer, receivedExchangeReplies replies: [GKTurnBasedExchangeReply], forCompletedExchange exchange: GKTurnBasedExchange)
 	func quitRequest(from player: GKPlayer)
-
 }
 
 enum TurnBasedError: Error { case noMatchDelegate }
@@ -23,6 +22,7 @@ enum TurnBasedError: Error { case noMatchDelegate }
 public class TurnBasedActiveMatch<Delegate: TurnBasedActiveMatchDelegate>: NSObject, ObservableObject, SomeTurnBasedActiveMatch {
 	public let match: GKTurnBasedMatch
 	public var delegate: Delegate?
+	public var matchDelegate: AnyObject? { delegate }
 	public var currentPlayer: GKPlayer? { match.currentParticipant?.player }
 	public var nextPlayers: [GKPlayer] {
 		guard let current = match.currentParticipant, let currentIndex = match.participants.firstIndex(of: current) else { return match.participants.compactMap { $0.player }}

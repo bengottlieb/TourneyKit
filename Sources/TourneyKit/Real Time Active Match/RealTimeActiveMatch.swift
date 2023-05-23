@@ -16,7 +16,8 @@ public class RealTimeActiveMatch<Delegate: RealTimeActiveMatchDelegate>: NSObjec
 	var recentDataDepth = 5
 	@Published public var recentErrors: [Error] = []
 	public var allPlayers: [GKPlayer] { [GKLocalPlayer.local] + match.players }
-	
+	public var matchDelegate: AnyObject? { delegate }
+
 	init(match: GKMatch, delegate: Delegate?) {
 		self.match = match
 		super.init()

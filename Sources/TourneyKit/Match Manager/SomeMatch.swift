@@ -11,4 +11,6 @@ import GameKit
 public protocol SomeMatch: AnyObject {
 	var turnBasedMatch: GKTurnBasedMatch? { get }
 	var realTimeMatch: GKMatch? { get }
+	
+	var matchDelegate: AnyObject? { get }
 }

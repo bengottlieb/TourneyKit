@@ -8,7 +8,7 @@
 import Foundation
 import GameKit
 
-public protocol RealTimeActiveMatchDelegate {
+public protocol RealTimeActiveMatchDelegate: AnyObject {
 	associatedtype GameState: Codable
 	associatedtype GameUpdate: Codable
 	

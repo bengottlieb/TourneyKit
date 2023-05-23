@@ -9,12 +9,12 @@ import Foundation
 import TourneyKit
 import GameKit
 
-final class RPSGame: RealTimeActiveMatchDelegate, ObservableObject {
+final class RealTimeGameExample: RealTimeActiveMatchDelegate, ObservableObject {
 	
 	@Published var state: GameState = GameState(currentPlayerID: "")
 	@Published var players: [GKPlayer] = []
 	@Published var isStarted = false
-	var match: RealTimeActiveMatch<RPSGame>?
+	var match: RealTimeActiveMatch<RealTimeGameExample>?
 	
 	struct GameState: Codable {
 		var currentPlayerID: String
@@ -56,14 +56,14 @@ final class RPSGame: RealTimeActiveMatchDelegate, ObservableObject {
 	struct GameUpdate: Codable {
 	}
 	
-	func loaded(match: RealTimeActiveMatch<RPSGame>, with players: [GKPlayer]) {
+	func loaded(match: RealTimeActiveMatch<RealTimeGameExample>, with players: [GKPlayer]) {
 		self.match = match
 		self.players = players
 		self.isStarted = true
 		checkForReady()
 	}
 	
-	func matchPhaseChanged(to phase: ActiveMatchPhase, in match: RealTimeActiveMatch<RPSGame>) {
+	func matchPhaseChanged(to phase: ActiveMatchPhase, in match: RealTimeActiveMatch<RealTimeGameExample>) {
 		objectWillChange.send()
 
 		switch phase {

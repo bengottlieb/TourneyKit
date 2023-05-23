@@ -1,5 +1,5 @@
 //
-//  RPSGameView.swift
+//  RealTimeGameView.swift
 //  TourneyKitTestHarness
 //
 //  Created by Ben Gottlieb on 5/19/23.
@@ -8,8 +8,8 @@
 import SwiftUI
 import TourneyKit
 
-struct RPSGameView: View {
-	@ObservedObject var game: RPSGame
+struct RealTimeGameView: View {
+	@ObservedObject var game: RealTimeGameExample
 	@State var showLog = false
 	var body: some View {
 		ZStack {
@@ -89,7 +89,7 @@ struct RPSGameView: View {
 	}
 }
 //
-//struct RPSGameView_Previews: PreviewProvider {
+//struct RealTimeGameView_Previews: PreviewProvider {
 //    static var previews: some View {
 //        RPSGameState()
 //    }

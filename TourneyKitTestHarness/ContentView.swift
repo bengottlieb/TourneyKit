@@ -11,8 +11,8 @@ import GameKit
 
 
 struct ContentView: View {
-	@State var game = RPSGame()
-	@State var turnBasedGame: TTTGame?
+	@State var game = RealTimeGameExample()
+	@State var turnBasedGame: TurnBasedGameExample?
 	@ObservedObject var mgr = MatchManager.instance
 	@State var matchView: RealTimeMatchmakerView?
 	@State var match: GKMatch?
@@ -21,10 +21,10 @@ struct ContentView: View {
 	
 	var body: some View {
 		VStack(spacing: 5) {
-			if let turnBased = turnBasedGame {
-				TTTGameView(game: turnBased)
+			if let turnBased = MatchManager.instance.turnBasedActiveMatch?.matchDelegate as? TurnBasedGameExample {
+				TurnBasedGameView(game: turnBased)
 			} else if game.isStarted {
-				RPSGameView(game: game)
+				RealTimeGameView(game: game)
 			} else {
 				Text("\(GKLocalPlayer.local.displayName) - \(GKLocalPlayer.local.tourneyKitID ?? "--")")
 				Spacer()
@@ -64,9 +64,8 @@ struct ContentView: View {
 		}
 		.onChange(of: turnBasedMatch) { match in
 			guard let match else { return }
-			let game = TTTGame()
-			MatchManager.instance.load(match: match, delegate: game)
-			turnBasedGame = game
+			turnBasedGame = TurnBasedGameExample()
+			MatchManager.instance.load(match: match, delegate: turnBasedGame!)
 		}
 		.onChange(of: match) { newValue in
 			if let newValue {

@@ -29,14 +29,16 @@ import GameKit
 		isAutomatching = false
 	}
 	
-	public func load<Delegate: RealTimeActiveMatchDelegate>(match: GKMatch, delegate: Delegate) {
+	@MainActor public func load<Delegate: RealTimeActiveMatchDelegate>(match: GKMatch, delegate: Delegate) {
+		objectWillChange.send()
 		let active = RealTimeActiveMatch(match: match, delegate: delegate)
 		self.realTimeActiveMatch = active
 		delegate.loaded(match: active, with: active.allPlayers)
 		isAutomatching = false
 	}
 	
-	public func load<Delegate: TurnBasedActiveMatchDelegate>(match: GKTurnBasedMatch, delegate: Delegate) {
+	@MainActor public func load<Delegate: TurnBasedActiveMatchDelegate>(match: GKTurnBasedMatch, delegate: Delegate) {
+		objectWillChange.send()
 		let active = TurnBasedActiveMatch(match: match, delegate: delegate)
 		self.turnBasedActiveMatch = active
 		delegate.loaded(match: active)
