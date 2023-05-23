@@ -21,7 +21,7 @@ struct ContentView: View {
 	
 	var body: some View {
 		VStack(spacing: 5) {
-			if let turnBased = MatchManager.instance.turnBasedActiveMatch?.matchDelegate as? TurnBasedGameExample {
+			if let turnBased = MatchManager.instance.turnBasedActiveMatch?.parentGame as? TurnBasedGameExample {
 				TurnBasedGameView(game: turnBased)
 			} else if game.isStarted {
 				RealTimeGameView(game: game)
@@ -53,7 +53,7 @@ struct ContentView: View {
 						let game = TurnBasedGameExample()
 						Task {
 							do {
-								try await mgr.restore(delegate: game)
+								try await mgr.restore(game: game)
 								self.turnBasedGame = game
 							} catch {
 								print("Failed to restore game: \(error)")
@@ -80,18 +80,18 @@ struct ContentView: View {
 		.onChange(of: turnBasedMatch) { match in
 			guard let match else { return }
 			turnBasedGame = TurnBasedGameExample()
-			MatchManager.instance.load(match: match, delegate: turnBasedGame!)
+			MatchManager.instance.load(match: match, game: turnBasedGame!)
 		}
 		.onChange(of: match) { newValue in
 			if let newValue {
-				mgr.load(match: newValue, delegate: game)
+				mgr.load(match: newValue, game: game)
 			}
 		}
 	}
 	
 	func startGame() {
 		Task {
-			try await mgr.startAutomatching(request: game.request, delegate: game)
+			try await mgr.startAutomatching(request: game.request, game: game)
 		}
 	}
 	

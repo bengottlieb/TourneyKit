@@ -9,7 +9,7 @@ import Foundation
 import GameKit
 import TourneyKit
 
-final class TurnBasedGameExample: TurnBasedActiveMatchDelegate, ObservableObject {
+final class TurnBasedGameExample: TurnBasedGame, ObservableObject {
 	typealias GameState = TurnBasedGameExampleState
 	
 	var match: TurnBasedActiveMatch<TurnBasedGameExample>?

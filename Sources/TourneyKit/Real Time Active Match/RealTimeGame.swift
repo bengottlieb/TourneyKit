@@ -1,5 +1,5 @@
 //
-//  RealTimeActiveMatchDelegate.swift
+//  RealTimeGame.swift
 //  
 //
 //  Created by Ben Gottlieb on 5/20/23.
@@ -8,7 +8,7 @@
 import Foundation
 import GameKit
 
-public protocol RealTimeActiveMatchDelegate: AnyObject {
+public protocol RealTimeGame: AnyObject {
 	associatedtype GameState: Codable
 	associatedtype GameUpdate: Codable
 	

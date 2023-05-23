@@ -17,12 +17,12 @@ public protocol SomeTurnBasedActiveMatch: SomeMatch {
 	func quitRequest(from player: GKPlayer)
 }
 
-enum TurnBasedError: Error { case noMatchDelegate }
+enum TurnBasedError: Error { case noMatchGame }
 
-public class TurnBasedActiveMatch<Delegate: TurnBasedActiveMatchDelegate>: NSObject, ObservableObject, SomeTurnBasedActiveMatch {
+public class TurnBasedActiveMatch<Game: TurnBasedGame>: NSObject, ObservableObject, SomeTurnBasedActiveMatch {
 	public let match: GKTurnBasedMatch
-	public var delegate: Delegate?
-	public var matchDelegate: AnyObject? { delegate }
+	public var game: Game?
+	public var parentGame: AnyObject? { game }
 	public var currentPlayer: GKPlayer? { match.currentParticipant?.player }
 	public var nextPlayers: [GKPlayer] {
 		guard let current = match.currentParticipant, let currentIndex = match.participants.firstIndex(of: current) else { return match.participants.compactMap { $0.player }}
@@ -33,15 +33,15 @@ public class TurnBasedActiveMatch<Delegate: TurnBasedActiveMatchDelegate>: NSObj
 		return participants.compactMap { $0.player }
 	}
 	
-	init(match: GKTurnBasedMatch, delegate: Delegate?) {
+	init(match: GKTurnBasedMatch, game: Game?) {
 		self.match = match
-		self.delegate = delegate
+		self.game = game
 	}
 	
 	public var isLocalPlayersTurn: Bool { match.currentParticipant?.player == GKLocalPlayer.local }
 	
 	public func endTurn(nextPlayers: [GKPlayer]? = nil, timeOut: TimeInterval = 60.0) async throws {
-		guard let payload = delegate?.gameState else { throw TurnBasedError.noMatchDelegate }
+		guard let payload = game?.gameState else { throw TurnBasedError.noMatchGame }
 		let data = try JSONEncoder().encode(payload)
 
 		var partipants = nextPlayers?.mapToParticpants(in: match) ?? nextPlayerArray
@@ -63,10 +63,10 @@ public class TurnBasedActiveMatch<Delegate: TurnBasedActiveMatchDelegate>: NSObj
 	public func receivedTurn(for player: GKPlayer, didBecomeActive: Bool) {
 		do {
 			if let data = match.matchData {
-				let payload = try JSONDecoder().decode(Delegate.GameState.self, from: data)
-				delegate?.received(gameState: payload)
+				let payload = try JSONDecoder().decode(Game.GameState.self, from: data)
+				game?.received(gameState: payload)
 			} else {
-				delegate?.received(gameState: nil)
+				game?.received(gameState: nil)
 			}
 		} catch {
 			print("Failed to decode Game State: \(error)")

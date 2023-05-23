@@ -21,15 +21,15 @@ extension RealTimeActiveMatch {
 				}
 				
 			case .state:
-				if let full = try? JSONDecoder().decode(MessageMatchState<Delegate.GameState>.self, from: data) {
+				if let full = try? JSONDecoder().decode(MessageMatchState<Game.GameState>.self, from: data) {
 					Logger.instance.log(.matchStateReceived(match, data))
-					delegate?.matchStateChanged(to: full.payload)
+					game?.matchStateChanged(to: full.payload)
 				}
 				
 			case .update:
-				if let full = try? JSONDecoder().decode(MessageMatchState<Delegate.GameUpdate>.self, from: data) {
+				if let full = try? JSONDecoder().decode(MessageMatchState<Game.GameUpdate>.self, from: data) {
 					Logger.instance.log(.matchUpateReceived(match, data))
-					delegate?.matchUpdated(with: full.payload)
+					game?.matchUpdated(with: full.payload)
 				}
 				
 			case .playerInfo:
@@ -44,11 +44,11 @@ extension RealTimeActiveMatch {
 		}
 	}
 	
-	public func sendUpdate(_ update: Delegate.GameUpdate, reliably: Bool = true) throws {
+	public func sendUpdate(_ update: Game.GameUpdate, reliably: Bool = true) throws {
 		try send(message: MessageMatchUpdate(update), reliably: reliably)
 	}
 	
-	public func sendState(_ state: Delegate.GameState, reliably: Bool = true) throws {
+	public func sendState(_ state: Game.GameState, reliably: Bool = true) throws {
 		try send(message: MessageMatchState(state), reliably: reliably)
 	}
 	

@@ -32,19 +32,19 @@ enum MatchManagerError: Error { case missingMatchID }
 		isAutomatching = false
 	}
 	
-	public func load<Delegate: RealTimeActiveMatchDelegate>(match: GKMatch, delegate: Delegate) {
+	public func load<Game: RealTimeGame>(match: GKMatch, game: Game) {
 		objectWillChange.send()
-		let active = RealTimeActiveMatch(match: match, delegate: delegate)
+		let active = RealTimeActiveMatch(match: match, game: game)
 		self.realTimeActiveMatch = active
-		delegate.loaded(match: active, with: active.allPlayers)
+		game.loaded(match: active, with: active.allPlayers)
 		isAutomatching = false
 	}
 	
-	public func load<Delegate: TurnBasedActiveMatchDelegate>(match: GKTurnBasedMatch, delegate: Delegate) {
+	public func load<Game: TurnBasedGame>(match: GKTurnBasedMatch, game: Game) {
 		objectWillChange.send()
-		let active = TurnBasedActiveMatch(match: match, delegate: delegate)
+		let active = TurnBasedActiveMatch(match: match, game: game)
 		self.turnBasedActiveMatch = active
-		delegate.loaded(match: active)
+		game.loaded(match: active)
 		lastMatchID  = match.matchID
 		isAutomatching = false
 	}
@@ -58,13 +58,13 @@ enum MatchManagerError: Error { case missingMatchID }
 		lastMatchID = nil
 	}
 	
-	public func startAutomatching<Delegate: RealTimeActiveMatchDelegate>(request: GKMatchRequest, delegate: Delegate) async throws {
+	public func startAutomatching<Game: RealTimeGame>(request: GKMatchRequest, game: Game) async throws {
 		if isAutomatching { return }
 		
 		isAutomatching = true
 		do {
 			let match = try await GKMatchmaker.shared().findMatch(for: request)
-			load(match: match, delegate: delegate)
+			load(match: match, game: game)
 		} catch {
 			isAutomatching = false
 			print("Failed to find match: \(error)")
@@ -73,11 +73,11 @@ enum MatchManagerError: Error { case missingMatchID }
 	}
 	
 	public var canRestoreMatch: Bool { lastMatchID != nil }
-	public func restore<Delegate: TurnBasedActiveMatchDelegate>(matchID: String? = nil, delegate: Delegate) async throws {
+	public func restore<Game: TurnBasedGame>(matchID: String? = nil, game: Game) async throws {
 		guard let id = matchID ?? lastMatchID else { throw MatchManagerError.missingMatchID }
 		let match = try await GKTurnBasedMatch.load(withID: id)
 		
-		load(match: match, delegate: delegate)
+		load(match: match, game: game)
 	}
 	
 	var rootViewController: UIViewController? {

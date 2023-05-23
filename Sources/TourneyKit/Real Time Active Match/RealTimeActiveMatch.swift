@@ -8,21 +8,21 @@
 import Foundation
 import GameKit
 
-public class RealTimeActiveMatch<Delegate: RealTimeActiveMatchDelegate>: NSObject, ObservableObject, GKMatchDelegate, SomeMatch {
+public class RealTimeActiveMatch<Game: RealTimeGame>: NSObject, ObservableObject, GKMatchDelegate, SomeMatch {
 	public let match: GKMatch
-	public var delegate: Delegate?
+	public var game: Game?
 	public private(set) var phase: ActiveMatchPhase = .loading
 	@Published public var recentlyReceivedData: [MatchMessage] = []
 	var recentDataDepth = 5
 	@Published public var recentErrors: [Error] = []
 	public var allPlayers: [GKPlayer] { [GKLocalPlayer.local] + match.players }
-	public var matchDelegate: AnyObject? { delegate }
+	public var parentGame: AnyObject? { game }
 
-	init(match: GKMatch, delegate: Delegate?) {
+	init(match: GKMatch, game: Game?) {
 		self.match = match
 		super.init()
 		
-		self.delegate = delegate
+		self.game = game
 		match.delegate = self
 	}
 	
@@ -72,7 +72,7 @@ public class RealTimeActiveMatch<Delegate: RealTimeActiveMatchDelegate>: NSObjec
 		if state == .connected { sendPlayerInfo() }
 		Task {
 			await MainActor.run {
-				self.delegate?.playersChanged(to: allPlayers)
+				self.game?.playersChanged(to: allPlayers)
 			}
 		}
 	}
@@ -92,7 +92,7 @@ public class RealTimeActiveMatch<Delegate: RealTimeActiveMatchDelegate>: NSObjec
 		self.phase = newPhase
 		
 		Task {
-			await MainActor.run { delegate?.matchPhaseChanged(to: newPhase, in: self) }
+			await MainActor.run { game?.matchPhaseChanged(to: newPhase, in: self) }
 		}
 	}
 }

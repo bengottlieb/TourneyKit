@@ -1,5 +1,5 @@
 //
-//  TurnBasedActiveMatchDelegate.swift
+//  TurnBasedGame.swift
 //  
 //
 //  Created by Ben Gottlieb on 5/22/23.
@@ -9,7 +9,7 @@ import SwiftUI
 import GameKit
 
 
-public protocol TurnBasedActiveMatchDelegate: ObservableObject {
+public protocol TurnBasedGame: ObservableObject {
 	associatedtype GameState: Codable
 	
 	var gameState: GameState { get set }
