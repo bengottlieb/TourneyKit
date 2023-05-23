@@ -8,13 +8,14 @@
 import SwiftUI
 import GameKit
 
-enum MatchManagerError: Error { case missingMatchID }
+enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyHaveActiveMatch }
 
 @MainActor public class MatchManager: NSObject, ObservableObject {
 	public static let instance = MatchManager()
 	
 	@Published public var isAuthenticated = false
 	@Published public var isAutomatching = false
+	@Published public var loadingMatch = false
 	@AppStorage("last_match_id") public var lastMatchID: String?
 
 	@Published public private(set) var realTimeActiveMatch: SomeMatch?
@@ -33,7 +34,6 @@ enum MatchManagerError: Error { case missingMatchID }
 	}
 	
 	public func load<Game: RealTimeGame>(match: GKMatch, game: Game) {
-		objectWillChange.send()
 		let active = RealTimeActiveMatch(match: match, game: game)
 		self.realTimeActiveMatch = active
 		game.loaded(match: active, with: active.allPlayers)
@@ -74,10 +74,14 @@ enum MatchManagerError: Error { case missingMatchID }
 	
 	public var canRestoreMatch: Bool { lastMatchID != nil }
 	public func restore<Game: TurnBasedGame>(matchID: String? = nil, game: Game) async throws {
+		guard turnBasedActiveMatch == nil else { throw MatchManagerError.alreadyHaveActiveMatch }
+		guard !loadingMatch else { throw MatchManagerError.restoreInProgress }
 		guard let id = matchID ?? lastMatchID else { throw MatchManagerError.missingMatchID }
+		loadingMatch = true
 		let match = try await GKTurnBasedMatch.load(withID: id)
 		
 		load(match: match, game: game)
+		loadingMatch = false
 	}
 	
 	var rootViewController: UIViewController? {

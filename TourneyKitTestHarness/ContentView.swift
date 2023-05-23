@@ -8,6 +8,7 @@
 import SwiftUI
 import TourneyKit
 import GameKit
+import Combine
 
 
 struct ContentView: View {
@@ -18,6 +19,8 @@ struct ContentView: View {
 	@State var match: GKMatch?
 	@State var showingTurnBasedUI = false
 	@State var turnBasedMatch: GKTurnBasedMatch?
+	@AppStorage("auto_restore_last_match") var autoRestoreLastMatch = false
+	@State var authenticationPublisher: AnyCancellable?
 	
 	var body: some View {
 		VStack(spacing: 5) {
@@ -49,26 +52,25 @@ struct ContentView: View {
 					Text("Start Turn Based")
 				}
 				if mgr.canRestoreMatch {
-					Button(action: {
-						let game = TurnBasedGameExample()
-						Task {
-							do {
-								try await mgr.restore(game: game)
-								self.turnBasedGame = game
-							} catch {
-								print("Failed to restore game: \(error)")
-							}
-						}
-					}) {
+					Button(action: { restore() }) {
 						Text("Restore Last Game")
 					}
 				}
+				Toggle("Auto Restore Last Match", isOn: $autoRestoreLastMatch)
 			}
 			Spacer()
 		}
 		.onAppear {
-			mgr.authenticate()
-			DispatchQueue.main.asyncAfter(deadline: .now() + 2) { mgr.showingGameCenterAvatar = false }
+			authenticationPublisher = mgr.authenticate()
+				.sink { _ in
+					DispatchQueue.main.async {
+						mgr.showingGameCenterAvatar = false
+						if autoRestoreLastMatch, turnBasedGame == nil {
+							print("Restoring: \(autoRestoreLastMatch)")
+							restore()
+						}
+					}
+				}
 		}
 		.sheet(item: $matchView) { view in
 			view.edgesIgnoringSafeArea(.all)
@@ -97,6 +99,18 @@ struct ContentView: View {
 	
 	func cancelStart() {
 		mgr.cancelAutomatching()
+	}
+	
+	func restore() {
+		let game = TurnBasedGameExample()
+		Task {
+			do {
+				try await mgr.restore(game: game)
+				self.turnBasedGame = game
+			} catch {
+				print("Failed to restore game: \(error)")
+			}
+		}
 	}
 }
 

@@ -7,6 +7,7 @@
 
 import Foundation
 import GameKit
+import Combine
 
 extension MatchManager: GKLocalPlayerListener {
 	public var showingGameCenterAvatar: Bool {
@@ -14,7 +15,9 @@ extension MatchManager: GKLocalPlayerListener {
 		set { GKAccessPoint.shared.isActive = newValue }
 	}
 	
-	public func authenticate() {
+	@discardableResult public func authenticate() -> AnyPublisher<Bool, Never> {
+		let publisher = CurrentValueSubject<Bool, Never>(false)
+		
 		GKLocalPlayer.local.authenticateHandler = { viewController, error in
 			if let viewController = viewController {
 				// If the view controller is non-nil, present it to the player so they can
@@ -39,7 +42,9 @@ extension MatchManager: GKLocalPlayerListener {
 			GKAccessPoint.shared.showHighlights = true
 			GKAccessPoint.shared.isActive = true
 			self.isAuthenticated = true
+			publisher.send(true)
 		}
+		return publisher.eraseToAnyPublisher()
 	}
 	
 }
