@@ -18,7 +18,7 @@ struct TurnBasedGameView: View {
 				Text("TTT Game")
 				HStack {
 					Spacer()
-					Button("Done") { mgr.turnBasedActiveMatch = nil }
+					Button("Done") { mgr.clearTurnBasedMatch() }
 						.padding()
 				}
 			}

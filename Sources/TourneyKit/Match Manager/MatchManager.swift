@@ -5,17 +5,20 @@
 //  Created by Ben Gottlieb on 5/19/23.
 //
 
-import Foundation
+import SwiftUI
 import GameKit
+
+enum MatchManagerError: Error { case missingMatchID }
 
 @MainActor public class MatchManager: NSObject, ObservableObject {
 	public static let instance = MatchManager()
 	
 	@Published public var isAuthenticated = false
 	@Published public var isAutomatching = false
+	@AppStorage("last_match_id") public var lastMatchID: String?
 
-	@Published public var realTimeActiveMatch: SomeMatch?
-	@Published public var turnBasedActiveMatch: SomeTurnBasedActiveMatch?
+	@Published public private(set) var realTimeActiveMatch: SomeMatch?
+	@Published public private(set) var turnBasedActiveMatch: SomeTurnBasedActiveMatch?
 	public var isInRealTimeMatch: Bool { realTimeActiveMatch != nil }
 	
 	override private init() {
@@ -29,7 +32,7 @@ import GameKit
 		isAutomatching = false
 	}
 	
-	@MainActor public func load<Delegate: RealTimeActiveMatchDelegate>(match: GKMatch, delegate: Delegate) {
+	public func load<Delegate: RealTimeActiveMatchDelegate>(match: GKMatch, delegate: Delegate) {
 		objectWillChange.send()
 		let active = RealTimeActiveMatch(match: match, delegate: delegate)
 		self.realTimeActiveMatch = active
@@ -37,12 +40,22 @@ import GameKit
 		isAutomatching = false
 	}
 	
-	@MainActor public func load<Delegate: TurnBasedActiveMatchDelegate>(match: GKTurnBasedMatch, delegate: Delegate) {
+	public func load<Delegate: TurnBasedActiveMatchDelegate>(match: GKTurnBasedMatch, delegate: Delegate) {
 		objectWillChange.send()
 		let active = TurnBasedActiveMatch(match: match, delegate: delegate)
 		self.turnBasedActiveMatch = active
 		delegate.loaded(match: active)
+		lastMatchID  = match.matchID
 		isAutomatching = false
+	}
+	
+	@MainActor public func clearRealTimeMatch() {
+		realTimeActiveMatch = nil
+	}
+	
+	@MainActor public func clearTurnBasedMatch() {
+		turnBasedActiveMatch = nil
+		lastMatchID = nil
 	}
 	
 	public func startAutomatching<Delegate: RealTimeActiveMatchDelegate>(request: GKMatchRequest, delegate: Delegate) async throws {
@@ -57,6 +70,14 @@ import GameKit
 			print("Failed to find match: \(error)")
 			throw error
 		}
+	}
+	
+	public var canRestoreMatch: Bool { lastMatchID != nil }
+	public func restore<Delegate: TurnBasedActiveMatchDelegate>(matchID: String? = nil, delegate: Delegate) async throws {
+		guard let id = matchID ?? lastMatchID else { throw MatchManagerError.missingMatchID }
+		let match = try await GKTurnBasedMatch.load(withID: id)
+		
+		load(match: match, delegate: delegate)
 	}
 	
 	var rootViewController: UIViewController? {

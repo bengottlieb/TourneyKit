@@ -48,6 +48,21 @@ struct ContentView: View {
 				Button(action: { showingTurnBasedUI.toggle() }) {
 					Text("Start Turn Based")
 				}
+				if mgr.canRestoreMatch {
+					Button(action: {
+						let game = TurnBasedGameExample()
+						Task {
+							do {
+								try await mgr.restore(delegate: game)
+								self.turnBasedGame = game
+							} catch {
+								print("Failed to restore game: \(error)")
+							}
+						}
+					}) {
+						Text("Restore Last Game")
+					}
+				}
 			}
 			Spacer()
 		}

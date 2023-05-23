@@ -43,7 +43,7 @@ public class RealTimeActiveMatch<Delegate: RealTimeActiveMatchDelegate>: NSObjec
 		Task {
 			await MainActor.run {
 				if MatchManager.instance.realTimeActiveMatch === self {
-					MatchManager.instance.realTimeActiveMatch = nil
+					MatchManager.instance.clearTurnBasedMatch()
 				}
 			}
 		}
