@@ -15,6 +15,7 @@ import GameKit
 	@Published public var isAutomatching = false
 
 	@Published public var realTimeActiveMatch: SomeMatch?
+	@Published public var turnBasedActiveMatch: SomeTurnBasedActiveMatch?
 	public var isInRealTimeMatch: Bool { realTimeActiveMatch != nil }
 	
 	override private init() {
@@ -32,6 +33,13 @@ import GameKit
 		let active = RealTimeActiveMatch(match: match, delegate: delegate)
 		self.realTimeActiveMatch = active
 		delegate.loaded(match: active, with: active.allPlayers)
+		isAutomatching = false
+	}
+	
+	public func load<Delegate: TurnBasedActiveMatchDelegate>(match: GKTurnBasedMatch, delegate: Delegate) {
+		let active = TurnBasedActiveMatch(match: match, delegate: delegate)
+		self.turnBasedActiveMatch = active
+		delegate.loaded(match: active)
 		isAutomatching = false
 	}
 	

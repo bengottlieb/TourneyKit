@@ -12,17 +12,24 @@ import GameKit
 
 struct ContentView: View {
 	@State var game = RPSGame()
+	@State var turnBasedGame: TTTGame?
 	@ObservedObject var mgr = MatchManager.instance
 	@State var matchView: RealTimeMatchmakerView?
 	@State var match: GKMatch?
-
+	@State var showingTurnBasedUI = false
+	@State var turnBasedMatch: GKTurnBasedMatch?
+	
 	var body: some View {
-		VStack {
-			if game.isStarted {
+		VStack(spacing: 5) {
+			if let turnBased = turnBasedGame {
+				TTTGameView(game: turnBased)
+			} else if game.isStarted {
 				RPSGameView(game: game)
 			} else {
 				Text("\(GKLocalPlayer.local.displayName) - \(GKLocalPlayer.local.tourneyKitID ?? "--")")
 				Spacer()
+				
+				Text("Real Time Matches")
 				Button("Search for Players") {
 					matchView = RealTimeMatchmakerView(request: game.request, match: $match)
 				}
@@ -36,6 +43,11 @@ struct ContentView: View {
 					.buttonStyle(.plain)
 					.opacity(mgr.isAutomatching ? 1 : 0)
 				}
+				
+				Text("Turn Based Matches")
+				Button(action: { showingTurnBasedUI.toggle() }) {
+					Text("Start Turn Based")
+				}
 			}
 			Spacer()
 		}
@@ -45,6 +57,16 @@ struct ContentView: View {
 		}
 		.sheet(item: $matchView) { view in
 			view.edgesIgnoringSafeArea(.all)
+		}
+		.sheet(isPresented: $showingTurnBasedUI) {
+			TurnBasedMatchmakerView(request: game.request, match: $turnBasedMatch)
+				.edgesIgnoringSafeArea(.all)
+		}
+		.onChange(of: turnBasedMatch) { match in
+			guard let match else { return }
+			let game = TTTGame()
+			MatchManager.instance.load(match: match, delegate: game)
+			turnBasedGame = game
 		}
 		.onChange(of: match) { newValue in
 			if let newValue {

@@ -8,9 +8,6 @@
 import Foundation
 import GameKit
 
-public protocol SomeMatch: AnyObject { }
-
-
 public class RealTimeActiveMatch<Delegate: RealTimeActiveMatchDelegate>: NSObject, ObservableObject, GKMatchDelegate, SomeMatch {
 	public let match: GKMatch
 	public var delegate: Delegate?
@@ -52,6 +49,9 @@ public class RealTimeActiveMatch<Delegate: RealTimeActiveMatchDelegate>: NSObjec
 		match.disconnect()
 	}
 	
+	public var turnBasedMatch: GKTurnBasedMatch? { nil }
+	public var realTimeMatch: GKMatch? { match }
+
 	public func endMatch() {
 		phase = .ended
 		sendPhaseChangedMessage()
