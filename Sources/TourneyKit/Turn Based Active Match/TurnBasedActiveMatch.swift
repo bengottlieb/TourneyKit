@@ -22,6 +22,7 @@ enum TurnBasedError: Error { case noMatchGame }
 public class TurnBasedActiveMatch<Game: TurnBasedGame>: NSObject, ObservableObject, SomeTurnBasedActiveMatch {
 	public let match: GKTurnBasedMatch
 	public weak var game: Game?
+	let manager: MatchManager
 	public var parentGame: AnyObject? { game }
 	public var currentPlayer: GKPlayer? { match.currentParticipant?.player }
 	public var nextPlayers: [GKPlayer] {
@@ -33,9 +34,10 @@ public class TurnBasedActiveMatch<Game: TurnBasedGame>: NSObject, ObservableObje
 		return participants.compactMap { $0.player }
 	}
 	
-	init(match: GKTurnBasedMatch, game: Game?) {
+	init(match: GKTurnBasedMatch, game: Game?, matchManager: MatchManager) {
 		self.match = match
 		self.game = game
+		self.manager = matchManager
 	}
 	
 	public var isLocalPlayersTurn: Bool { match.currentParticipant?.player == GKLocalPlayer.local }

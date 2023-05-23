@@ -14,7 +14,7 @@ import Combine
 struct ContentView: View {
 	@State var game = RealTimeGameExample()
 	@State var turnBasedGame: TurnBasedGameExample?
-	@ObservedObject var mgr = MatchManager.instance
+	@EnvironmentObject var mgr: MatchManager
 	@State var matchView: RealTimeMatchmakerView?
 	@State var match: GKMatch?
 	@State var showingTurnBasedUI = false
@@ -24,7 +24,7 @@ struct ContentView: View {
 	
 	var body: some View {
 		VStack(spacing: 5) {
-			if let turnBased = MatchManager.instance.turnBasedActiveMatch?.parentGame as? TurnBasedGameExample {
+			if let turnBased = mgr.turnBasedActiveMatch?.parentGame as? TurnBasedGameExample {
 				TurnBasedGameView(game: turnBased)
 			} else if game.isStarted {
 				RealTimeGameView(game: game)
@@ -83,7 +83,7 @@ struct ContentView: View {
 		.onChange(of: turnBasedMatch) { match in
 			guard let match else { return }
 			turnBasedGame = TurnBasedGameExample()
-			MatchManager.instance.load(match: match, game: turnBasedGame!)
+			mgr.load(match: match, game: turnBasedGame!)
 		}
 		.onChange(of: match) { newValue in
 			if let newValue {

@@ -11,6 +11,7 @@ import GameKit
 public class RealTimeActiveMatch<Game: RealTimeGame>: NSObject, ObservableObject, GKMatchDelegate, SomeMatch {
 	public let match: GKMatch
 	public weak var game: Game?
+	let manager: MatchManager
 	public private(set) var phase: ActiveMatchPhase = .loading
 	@Published public var recentlyReceivedData: [MatchMessage] = []
 	var recentDataDepth = 5
@@ -18,8 +19,9 @@ public class RealTimeActiveMatch<Game: RealTimeGame>: NSObject, ObservableObject
 	public var allPlayers: [GKPlayer] { [GKLocalPlayer.local] + match.players }
 	public var parentGame: AnyObject? { game }
 
-	init(match: GKMatch, game: Game?) {
+	init(match: GKMatch, game: Game?, matchManager: MatchManager) {
 		self.match = match
+		self.manager = matchManager
 		super.init()
 		
 		self.game = game
@@ -42,8 +44,8 @@ public class RealTimeActiveMatch<Game: RealTimeGame>: NSObject, ObservableObject
 	func terminateLocally() {
 		Task {
 			await MainActor.run {
-				if MatchManager.instance.realTimeActiveMatch === self {
-					MatchManager.instance.clearTurnBasedMatch()
+				if manager.realTimeActiveMatch === self {
+					manager.clearTurnBasedMatch()
 				}
 			}
 		}

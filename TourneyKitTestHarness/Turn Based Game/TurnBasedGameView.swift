@@ -10,7 +10,7 @@ import TourneyKit
 
 struct TurnBasedGameView: View {
 	@ObservedObject var game: TurnBasedGameExample
-	@ObservedObject var mgr = MatchManager.instance
+	@EnvironmentObject var mgr: MatchManager
 	
 	var body: some View {
 		VStack {

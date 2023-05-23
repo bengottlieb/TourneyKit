@@ -34,7 +34,7 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 	}
 	
 	public func load<Game: RealTimeGame>(match: GKMatch, game: Game) {
-		let active = RealTimeActiveMatch(match: match, game: game)
+		let active = RealTimeActiveMatch(match: match, game: game, matchManager: self)
 		self.realTimeActiveMatch = active
 		game.loaded(match: active, with: active.allPlayers)
 		isAutomatching = false
@@ -42,7 +42,7 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 	
 	public func load<Game: TurnBasedGame>(match: GKTurnBasedMatch, game: Game) {
 		objectWillChange.send()
-		let active = TurnBasedActiveMatch(match: match, game: game)
+		let active = TurnBasedActiveMatch(match: match, game: game, matchManager: self)
 		self.turnBasedActiveMatch = active
 		game.loaded(match: active)
 		lastMatchID  = match.matchID

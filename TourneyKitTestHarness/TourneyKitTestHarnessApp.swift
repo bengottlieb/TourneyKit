@@ -17,6 +17,7 @@ struct TourneyKitTestHarnessApp: App {
 	var body: some Scene {
 		WindowGroup {
 			ContentView()
+				.environmentObject(MatchManager.instance)
 		}
 	}
 }
