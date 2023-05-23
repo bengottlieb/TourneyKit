@@ -10,7 +10,7 @@ import GameKit
 
 public class RealTimeActiveMatch<Game: RealTimeGame>: NSObject, ObservableObject, GKMatchDelegate, SomeMatch {
 	public let match: GKMatch
-	public var game: Game?
+	public weak var game: Game?
 	public private(set) var phase: ActiveMatchPhase = .loading
 	@Published public var recentlyReceivedData: [MatchMessage] = []
 	var recentDataDepth = 5

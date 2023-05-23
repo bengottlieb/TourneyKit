@@ -21,7 +21,7 @@ enum TurnBasedError: Error { case noMatchGame }
 
 public class TurnBasedActiveMatch<Game: TurnBasedGame>: NSObject, ObservableObject, SomeTurnBasedActiveMatch {
 	public let match: GKTurnBasedMatch
-	public var game: Game?
+	public weak var game: Game?
 	public var parentGame: AnyObject? { game }
 	public var currentPlayer: GKPlayer? { match.currentParticipant?.player }
 	public var nextPlayers: [GKPlayer] {
