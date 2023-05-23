@@ -83,10 +83,4 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 		load(match: match, game: game)
 		loadingMatch = false
 	}
-	
-	var rootViewController: UIViewController? {
-		let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
-		return windowScene?.windows.first?.rootViewController
-	}
-	
 }

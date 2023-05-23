@@ -60,11 +60,12 @@ struct ContentView: View {
 			}
 			Spacer()
 		}
+		.padding()
 		.onAppear {
-			authenticationPublisher = mgr.authenticate()
+			authenticationPublisher = GameCenterInterface.instance.authenticate()
 				.sink { _ in
 					DispatchQueue.main.async {
-						mgr.showingGameCenterAvatar = false
+						GameCenterInterface.instance.showingGameCenterAvatar = false
 						if autoRestoreLastMatch, turnBasedGame == nil {
 							print("Restoring: \(autoRestoreLastMatch)")
 							restore()
