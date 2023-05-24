@@ -26,6 +26,16 @@ extension MatchManager /* GKTurnBasedEventListener */ {
 	
 	public func player(_ player: GKPlayer, didRequestMatchWithOtherPlayers playersToInvite: [GKPlayer]) {
 		Logger.instance.log(.didRequestMatch(playersToInvite))
+		guard let gameType = turnBasedGameClass else {
+			print("Received a Match Request from GameCenter, but no turnBasedGameClass is set in the MatchManager. Please set this if you want to support these messages.")
+			return
+		}
+		
+		DispatchQueue.main.async {
+			let request = gameType.defaultRequest
+			request.recipients = playersToInvite
+			self.pendingMatchRequest = request
+		}
 	}
 	
 	public func player(_ player: GKPlayer, receivedTurnEventFor match: GKTurnBasedMatch, didBecomeActive: Bool) {

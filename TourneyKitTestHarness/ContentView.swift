@@ -18,7 +18,6 @@ struct ContentView: View {
 	@State var matchView: RealTimeMatchmakerView?
 	@State var match: GKMatch?
 	@State var showingTurnBasedUI = false
-	@State var turnBasedMatch: GKTurnBasedMatch?
 	@AppStorage("auto_restore_last_match") var autoRestoreLastMatch = false
 	@State var authenticationPublisher: AnyCancellable?
 	
@@ -48,7 +47,7 @@ struct ContentView: View {
 				}
 				
 				Text("Turn Based Matches")
-				Button(action: { showingTurnBasedUI.toggle() }) {
+				Button(action: { mgr.pendingMatchRequest = TurnBasedGameExample.defaultRequest }) {
 					Text("Start Turn Based")
 				}
 				if mgr.canRestoreMatch {
@@ -76,14 +75,12 @@ struct ContentView: View {
 		.sheet(item: $matchView) { view in
 			view.edgesIgnoringSafeArea(.all)
 		}
-		.sheet(isPresented: $showingTurnBasedUI) {
-			TurnBasedMatchmakerView(request: game.request, match: $turnBasedMatch)
-				.edgesIgnoringSafeArea(.all)
-		}
-		.onChange(of: turnBasedMatch) { match in
-			guard let match else { return }
-			turnBasedGame = TurnBasedGameExample()
-			mgr.load(match: match, game: turnBasedGame!)
+		.sheet(item: $mgr.pendingMatchRequest) { request in
+			TurnBasedMatchmakerView(request: request) { newMatch in
+				turnBasedGame = TurnBasedGameExample()
+				mgr.load(match: newMatch, game: turnBasedGame!)
+			}
+			.edgesIgnoringSafeArea(.all)
 		}
 		.onChange(of: match) { newValue in
 			if let newValue {

@@ -16,6 +16,9 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 	@Published public var isAuthenticated = false
 	@Published public var isAutomatching = false
 	@Published public var loadingMatch = false
+	@Published public var pendingMatchRequest: GKMatchRequest?
+	public var turnBasedGameClass: (any TurnBasedGame.Type)?
+	
 	@AppStorage("last_match_id") public var lastMatchID: String?
 
 	@Published public private(set) var realTimeActiveMatch: SomeMatch?

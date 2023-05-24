@@ -15,6 +15,13 @@ final class TurnBasedGameExample: TurnBasedGame, ObservableObject {
 	var match: TurnBasedActiveMatch<TurnBasedGameExample>?
 	var gameState = TurnBasedGameExampleState()
 	
+	static var defaultRequest: GKMatchRequest {
+		let request = GKMatchRequest()
+		request.minPlayers = 2
+		request.maxPlayers = 2
+		return request
+	}
+	
 	func loaded(match: TourneyKit.TurnBasedActiveMatch<TurnBasedGameExample>) {
 		self.match = match
 	}

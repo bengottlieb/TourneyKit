@@ -10,13 +10,20 @@ import GameKit
 
 public struct TurnBasedMatchmakerView: UIViewControllerRepresentable, Identifiable {
 	@State var controller: GKTurnBasedMatchmakerViewController
-	@Binding var match: GKTurnBasedMatch?
 	public var id: NSObject { controller }
 	@Environment(\.dismiss) var dismiss
+	var completion: (GKTurnBasedMatch) -> Void
 	
 	public init(request: GKMatchRequest, match: Binding<GKTurnBasedMatch?>) {
 		_controller = State(initialValue: GKTurnBasedMatchmakerViewController(matchRequest: request))
-		_match = match
+		completion = { newMatch in
+			match.wrappedValue = newMatch
+		}
+	}
+	
+	public init(request: GKMatchRequest, completion: @escaping (GKTurnBasedMatch) -> Void) {
+		_controller = State(initialValue: GKTurnBasedMatchmakerViewController(matchRequest: request))
+		self.completion = completion
 	}
 	
 	public func makeUIViewController(context: Context) -> some UIViewController {
@@ -45,7 +52,7 @@ public struct TurnBasedMatchmakerView: UIViewControllerRepresentable, Identifiab
 		}
 		
 		public func turnBasedMatchmakerViewController(_ viewController: GKTurnBasedMatchmakerViewController, didFind match: GKTurnBasedMatch) {
-			view.match = match
+			view.completion(match)
 			view.dismiss()
 		}
 

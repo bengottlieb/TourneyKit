@@ -8,6 +8,10 @@
 import Foundation
 import GameKit
 
+extension GKMatchRequest: Identifiable {
+	
+}
+
 public extension GKMatchRequest {
 	var playerRange: ClosedRange<Int> {
 		get { minPlayers...maxPlayers }
