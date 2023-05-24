@@ -63,7 +63,7 @@ final class RealTimeGameExample: RealTimeGame, ObservableObject {
 		checkForReady()
 	}
 	
-	func matchPhaseChanged(to phase: ActiveMatchPhase, in match: RealTimeActiveMatch<RealTimeGameExample>) {
+	func matchPhaseChanged(to phase: ActiveMatchPhase) {
 		objectWillChange.send()
 
 		switch phase {

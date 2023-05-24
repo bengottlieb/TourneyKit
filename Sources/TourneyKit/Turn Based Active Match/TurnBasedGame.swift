@@ -15,7 +15,9 @@ public protocol TurnBasedGame: ObservableObject {
 	var gameState: GameState { get set }
 	func loaded(match: TurnBasedActiveMatch<Self>)
 	func received(gameState: GameState?)
-	
+	func matchEndedOnGameCenter()
+	func playerDropped(_ player: GKPlayer)
+
 	static var defaultRequest: GKMatchRequest { get }
 }
 

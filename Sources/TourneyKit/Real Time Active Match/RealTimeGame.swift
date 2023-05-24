@@ -18,7 +18,7 @@ public protocol RealTimeGame: AnyObject {
 	func matchStateChanged(to state: GameState)
 	func matchUpdated(with update: GameUpdate)
 
-	func matchPhaseChanged(to phase: ActiveMatchPhase, in match: RealTimeActiveMatch<Self>)
+	func matchPhaseChanged(to phase: ActiveMatchPhase)
 }
 
 public enum ActiveMatchPhase: String, Codable { case loading, playing, ended

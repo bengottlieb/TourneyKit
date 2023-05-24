@@ -94,7 +94,7 @@ public class RealTimeActiveMatch<Game: RealTimeGame>: NSObject, ObservableObject
 		self.phase = newPhase
 		
 		Task {
-			await MainActor.run { game?.matchPhaseChanged(to: newPhase, in: self) }
+			await MainActor.run { game?.matchPhaseChanged(to: newPhase) }
 		}
 	}
 }

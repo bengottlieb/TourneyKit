@@ -43,25 +43,41 @@ public class TurnBasedActiveMatch<Game: TurnBasedGame>: NSObject, ObservableObje
 	public var isLocalPlayersTurn: Bool { match.currentParticipant?.player == GKLocalPlayer.local }
 	
 	public func endTurn(nextPlayers: [GKPlayer]? = nil, timeOut: TimeInterval = 60.0) async throws {
-		guard let payload = game?.gameState else { throw TurnBasedError.noMatchGame }
-		let data = try JSONEncoder().encode(payload)
-
-		var partipants = nextPlayers?.mapToParticpants(in: match) ?? nextPlayerArray
-		if partipants.isEmpty { partipants = match.participants }
-		
-		try await match.endTurn(withNextParticipants: partipants, turnTimeout: timeOut, match: data)
+		try await match.endTurn(withNextParticipants: nextParticipants(startingWith: nextPlayers), turnTimeout: timeOut, match: try matchData)
 		objectWillChange.send()
 	}
 	
-	var nextPlayerArray: [GKTurnBasedParticipant] {
-		guard let current = match.currentParticipant, let index = match.participants.firstIndex(of: current) else { return [] }
-		
-		return [match.participants[(index + 1) % match.participants.count]]
+	public func resign(withOutcome outcome: GKTurnBasedMatch.Outcome, nextPlayers: [GKPlayer]? = nil, timeOut: TimeInterval = 60.0) async throws {
+		try await match.participantQuitInTurn(with: outcome, nextParticipants: nextParticipants(startingWith: nextPlayers), turnTimeout: timeOut, match: try matchData)
 	}
-
+	
 	public var turnBasedMatch: GKTurnBasedMatch? { match }
 	public var realTimeMatch: GKMatch? { nil }
 	
+}
+
+extension TurnBasedActiveMatch {
+	public var matchData: Data {
+		get throws {
+			guard let payload = game?.gameState else { throw TurnBasedError.noMatchGame }
+			let data = try JSONEncoder().encode(payload)
+			return data
+		}
+	}
+	
+	func nextParticipants(startingWith next: [GKPlayer]?) -> [GKTurnBasedParticipant] {
+		var partipants = next?.mapToParticpants(in: match)
+		if partipants == nil {
+			guard let current = match.currentParticipant, let index = match.participants.firstIndex(of: current) else { return [] }
+			
+			partipants = [match.participants[(index + 1) % match.participants.count]]
+		}
+		if partipants?.isEmpty != false { partipants = match.participants }
+		return partipants!
+	}
+}
+
+extension TurnBasedActiveMatch {
 	public func receivedTurn(for player: GKPlayer, didBecomeActive: Bool) {
 		do {
 			if let data = match.matchData {
@@ -76,7 +92,7 @@ public class TurnBasedActiveMatch<Game: TurnBasedGame>: NSObject, ObservableObje
 	}
 	
 	public func matchEnded(for player: GKPlayer) {
-		
+		game?.matchEndedOnGameCenter()
 	}
 
 	public func player(_ player: GKPlayer, receivedExchangeRequest exchange: GKTurnBasedExchange) {
@@ -91,7 +107,7 @@ public class TurnBasedActiveMatch<Game: TurnBasedGame>: NSObject, ObservableObje
 	}
 	
 	public func quitRequest(from player: GKPlayer) {
-		
+		game?.playerDropped(player)
 	}
 
 }

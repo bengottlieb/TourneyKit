@@ -41,6 +41,14 @@ final class TurnBasedGameExample: TurnBasedGame, ObservableObject {
 			print("Failed to end turn: \(error)")
 		}
 	}
+	
+	func matchEndedOnGameCenter() {
+		print("Game over, man. Game over!")
+	}
+	
+	func playerDropped(_ player: GKPlayer) {
+		print("\(player.displayName) has dropped the game.")
+	}
 }
 
 

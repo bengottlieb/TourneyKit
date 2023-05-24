@@ -42,10 +42,10 @@ extension MatchManager /* GKTurnBasedEventListener */ {
 		Logger.instance.log(.receivedTurnEvent(player, match))
 		if match === turnBasedActiveMatch?.turnBasedMatch { turnBasedActiveMatch?.receivedTurn(for: player, didBecomeActive: didBecomeActive) }
 	}
+	
 	public func player(_ player: GKPlayer, matchEnded match: GKTurnBasedMatch) {
 		Logger.instance.log(.matchEnded(match))
 		if match === turnBasedActiveMatch?.turnBasedMatch { turnBasedActiveMatch?.matchEnded(for: player) }
-
 	}
 	
 	public func player(_ player: GKPlayer, receivedExchangeRequest exchange: GKTurnBasedExchange, for match: GKTurnBasedMatch) {
@@ -56,7 +56,6 @@ extension MatchManager /* GKTurnBasedEventListener */ {
 	public func player(_ player: GKPlayer, receivedExchangeCancellation exchange: GKTurnBasedExchange, for match: GKTurnBasedMatch) {
 		Logger.instance.log(.receivedExchangeCancellation(exchange, match))
 		if match === turnBasedActiveMatch?.turnBasedMatch { turnBasedActiveMatch?.player(player, receivedExchangeCancellation: exchange) }
-
 	}
 	
 	public func player(_ player: GKPlayer, receivedExchangeReplies replies: [GKTurnBasedExchangeReply], forCompletedExchange exchange: GKTurnBasedExchange, for match: GKTurnBasedMatch) {
