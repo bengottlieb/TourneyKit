@@ -40,33 +40,33 @@ extension MatchManager /* GKTurnBasedEventListener */ {
 	
 	public func player(_ player: GKPlayer, receivedTurnEventFor match: GKTurnBasedMatch, didBecomeActive: Bool) {
 		Logger.instance.log(.receivedTurnEvent(player, match))
-		if match === turnBasedActiveMatch?.turnBasedMatch { turnBasedActiveMatch?.receivedTurn(for: player, didBecomeActive: didBecomeActive) }
+		if match.matchID == turnBasedActiveMatch?.turnBasedMatch?.matchID { turnBasedActiveMatch?.receivedTurn(for: player, didBecomeActive: didBecomeActive, in: match) }
 	}
 	
 	public func player(_ player: GKPlayer, matchEnded match: GKTurnBasedMatch) {
 		Logger.instance.log(.matchEnded(match))
-		if match === turnBasedActiveMatch?.turnBasedMatch { turnBasedActiveMatch?.matchEnded(for: player) }
+		if match.matchID == turnBasedActiveMatch?.turnBasedMatch?.matchID { turnBasedActiveMatch?.matchEnded(for: player, in: match) }
 	}
 	
 	public func player(_ player: GKPlayer, receivedExchangeRequest exchange: GKTurnBasedExchange, for match: GKTurnBasedMatch) {
 		Logger.instance.log(.receivedExchangeRequest(exchange, match))
-		if match === turnBasedActiveMatch?.turnBasedMatch { turnBasedActiveMatch?.player(player, receivedExchangeRequest: exchange) }
+		if match.matchID == turnBasedActiveMatch?.turnBasedMatch?.matchID { turnBasedActiveMatch?.player(player, receivedExchangeRequest: exchange, in: match) }
 	}
 	
 	public func player(_ player: GKPlayer, receivedExchangeCancellation exchange: GKTurnBasedExchange, for match: GKTurnBasedMatch) {
 		Logger.instance.log(.receivedExchangeCancellation(exchange, match))
-		if match === turnBasedActiveMatch?.turnBasedMatch { turnBasedActiveMatch?.player(player, receivedExchangeCancellation: exchange) }
+		if match.matchID == turnBasedActiveMatch?.turnBasedMatch?.matchID { turnBasedActiveMatch?.player(player, receivedExchangeCancellation: exchange, in: match) }
 	}
 	
 	public func player(_ player: GKPlayer, receivedExchangeReplies replies: [GKTurnBasedExchangeReply], forCompletedExchange exchange: GKTurnBasedExchange, for match: GKTurnBasedMatch) {
 		Logger.instance.log(.receivedExchangeReplies(replies, exchange, match))
-		if match === turnBasedActiveMatch?.turnBasedMatch { turnBasedActiveMatch?.player(player, receivedExchangeReplies: replies, forCompletedExchange: exchange) }
+		if match.matchID == turnBasedActiveMatch?.turnBasedMatch?.matchID { turnBasedActiveMatch?.player(player, receivedExchangeReplies: replies, forCompletedExchange: exchange, in: match) }
 
 	}
 	
 	public func player(_ player: GKPlayer, wantsToQuitMatch match: GKTurnBasedMatch) {
 		Logger.instance.log(.wantsToQuitMatch(player, match))
-		if match === turnBasedActiveMatch?.turnBasedMatch { turnBasedActiveMatch?.quitRequest(from: player) }
+		if match.matchID == turnBasedActiveMatch?.turnBasedMatch?.matchID { turnBasedActiveMatch?.quitRequest(from: player, in: match) }
 
 	}
 	

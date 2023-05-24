@@ -21,3 +21,16 @@ public protocol TurnBasedGame: ObservableObject {
 	static var defaultRequest: GKMatchRequest { get }
 }
 
+extension GKTurnBasedMatch.Status: CustomStringConvertible {
+	public var description: String {
+		switch self {
+		case .unknown: return "unknown"
+		case .open: return "playing"
+		case .ended: return "over"
+		case .matching: return "matching"
+			
+		@unknown default:
+			return "@unknown"
+		}
+	}
+}

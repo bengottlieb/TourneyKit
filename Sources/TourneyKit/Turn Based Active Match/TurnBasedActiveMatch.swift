@@ -9,22 +9,24 @@ import Foundation
 import GameKit
 
 public protocol SomeTurnBasedActiveMatch: SomeMatch {
-	func receivedTurn(for player: GKPlayer, didBecomeActive: Bool)
-	func matchEnded(for player: GKPlayer)
-	func player(_ player: GKPlayer, receivedExchangeRequest exchange: GKTurnBasedExchange)
-	func player(_ player: GKPlayer, receivedExchangeCancellation exchange: GKTurnBasedExchange)
-	func player(_ player: GKPlayer, receivedExchangeReplies replies: [GKTurnBasedExchangeReply], forCompletedExchange exchange: GKTurnBasedExchange)
-	func quitRequest(from player: GKPlayer)
+	func receivedTurn(for player: GKPlayer, didBecomeActive: Bool, in match: GKTurnBasedMatch)
+	func matchEnded(for player: GKPlayer, in match: GKTurnBasedMatch)
+	func player(_ player: GKPlayer, receivedExchangeRequest exchange: GKTurnBasedExchange, in match: GKTurnBasedMatch)
+	func player(_ player: GKPlayer, receivedExchangeCancellation exchange: GKTurnBasedExchange, in match: GKTurnBasedMatch)
+	func player(_ player: GKPlayer, receivedExchangeReplies replies: [GKTurnBasedExchangeReply], forCompletedExchange exchange: GKTurnBasedExchange, in match: GKTurnBasedMatch)
+	func quitRequest(from player: GKPlayer, in match: GKTurnBasedMatch)
 }
 
-enum TurnBasedError: Error { case noMatchGame }
+enum TurnBasedError: Error { case noMatchGame, triedToEndGameWhenItsNotYourTurn, triedToEndGameWhenNotPlaying }
 
 public class TurnBasedActiveMatch<Game: TurnBasedGame>: NSObject, ObservableObject, SomeTurnBasedActiveMatch {
-	public let match: GKTurnBasedMatch
+	public var match: GKTurnBasedMatch
 	public weak var game: Game?
 	let manager: MatchManager
 	public var parentGame: AnyObject? { game }
 	public var currentPlayer: GKPlayer? { match.currentParticipant?.player }
+	public var status: GKTurnBasedMatch.Status { isLocalPlayerPlaying ? match.status : .ended }
+	public var isCurrentPlayersTurn: Bool { currentPlayer == GKLocalPlayer.local }
 	public var nextPlayers: [GKPlayer] {
 		guard let current = match.currentParticipant, let currentIndex = match.participants.firstIndex(of: current) else { return match.participants.compactMap { $0.player }}
 		
@@ -40,7 +42,9 @@ public class TurnBasedActiveMatch<Game: TurnBasedGame>: NSObject, ObservableObje
 		self.manager = matchManager
 	}
 	
-	public var isLocalPlayersTurn: Bool { match.currentParticipant?.player == GKLocalPlayer.local }
+	public var isLocalPlayersTurn: Bool { match.currentParticipant == localParticipant }
+	public var isLocalPlayerPlaying: Bool { localParticipant?.status == .active }
+	public var localParticipant: GKTurnBasedParticipant? { match.participants.first { $0.player == GKLocalPlayer.local }}
 	
 	public func endTurn(nextPlayers: [GKPlayer]? = nil, timeOut: TimeInterval = 60.0) async throws {
 		try await match.endTurn(withNextParticipants: nextParticipants(startingWith: nextPlayers), turnTimeout: timeOut, match: try matchData)
@@ -48,7 +52,22 @@ public class TurnBasedActiveMatch<Game: TurnBasedGame>: NSObject, ObservableObje
 	}
 	
 	public func resign(withOutcome outcome: GKTurnBasedMatch.Outcome, nextPlayers: [GKPlayer]? = nil, timeOut: TimeInterval = 60.0) async throws {
-		try await match.participantQuitInTurn(with: outcome, nextParticipants: nextParticipants(startingWith: nextPlayers), turnTimeout: timeOut, match: try matchData)
+		try await reloadMatch()
+		let next = nextParticipants(startingWith: nextPlayers)
+		
+		if !isLocalPlayerPlaying {
+			throw TurnBasedError.triedToEndGameWhenNotPlaying
+		} else if next.count <= 1 { 	// no more players, end the game
+			match.currentParticipant?.matchOutcome = .second
+			next.first?.matchOutcome = .won
+			if !isCurrentPlayersTurn { throw TurnBasedError.triedToEndGameWhenItsNotYourTurn }
+			try await match.endMatchInTurn(withMatch: matchData)
+		} else if isCurrentPlayersTurn {
+			try await match.participantQuitInTurn(with: outcome, nextParticipants: next, turnTimeout: timeOut, match: try matchData)
+		} else {
+			try await match.participantQuitOutOfTurn(with: outcome)
+		}
+		try await reloadMatch()
 	}
 	
 	public var turnBasedMatch: GKTurnBasedMatch? { match }
@@ -65,6 +84,10 @@ extension TurnBasedActiveMatch {
 		}
 	}
 	
+	public func reloadMatch() async throws {
+		try await match.loadMatchData()
+	}
+	
 	func nextParticipants(startingWith next: [GKPlayer]?) -> [GKTurnBasedParticipant] {
 		var partipants = next?.mapToParticpants(in: match)
 		if partipants == nil {
@@ -73,12 +96,13 @@ extension TurnBasedActiveMatch {
 			partipants = [match.participants[(index + 1) % match.participants.count]]
 		}
 		if partipants?.isEmpty != false { partipants = match.participants }
-		return partipants!
+		return partipants!.filter { $0.status == .active || $0.status == .matching }
 	}
 }
 
 extension TurnBasedActiveMatch {
-	public func receivedTurn(for player: GKPlayer, didBecomeActive: Bool) {
+	public func receivedTurn(for player: GKPlayer, didBecomeActive: Bool, in match: GKTurnBasedMatch) {
+		self.match = match
 		do {
 			if let data = match.matchData {
 				let payload = try JSONDecoder().decode(Game.GameState.self, from: data)
@@ -91,23 +115,28 @@ extension TurnBasedActiveMatch {
 		}
 	}
 	
-	public func matchEnded(for player: GKPlayer) {
+	public func matchEnded(for player: GKPlayer, in match: GKTurnBasedMatch) {
+		self.match = match
 		game?.matchEndedOnGameCenter()
 	}
 
-	public func player(_ player: GKPlayer, receivedExchangeRequest exchange: GKTurnBasedExchange) {
-		
+	public func player(_ player: GKPlayer, receivedExchangeRequest exchange: GKTurnBasedExchange, in match: GKTurnBasedMatch) {
+		self.match = match
 	}
 	
-	public func player(_ player: GKPlayer, receivedExchangeCancellation exchange: GKTurnBasedExchange) {
-		
+	public func player(_ player: GKPlayer, receivedExchangeCancellation exchange: GKTurnBasedExchange, in match: GKTurnBasedMatch) {
+		self.match = match
 	}
 	
-	public func player(_ player: GKPlayer, receivedExchangeReplies replies: [GKTurnBasedExchangeReply], forCompletedExchange exchange: GKTurnBasedExchange) {
+	public func player(_ player: GKPlayer, receivedExchangeReplies replies: [GKTurnBasedExchangeReply], forCompletedExchange exchange: GKTurnBasedExchange, in match: GKTurnBasedMatch) {
+		self.match = match
 	}
 	
-	public func quitRequest(from player: GKPlayer) {
-		game?.playerDropped(player)
+	public func quitRequest(from player: GKPlayer, in match: GKTurnBasedMatch) {
+		self.match = match
+		DispatchQueue.main.async {
+			self.game?.playerDropped(player)
+		}
 	}
 
 }

@@ -44,14 +44,16 @@ final class TurnBasedGameExample: TurnBasedGame, ObservableObject {
 	
 	func matchEndedOnGameCenter() {
 		print("Game over, man. Game over!")
+		objectWillChange.send()
 	}
 	
 	func playerDropped(_ player: GKPlayer) {
 		print("\(player.displayName) has dropped the game.")
+		objectWillChange.send()
 	}
 }
 
 
 struct TurnBasedGameExampleState: Codable {
-	
+	var message = "Hello"
 }
