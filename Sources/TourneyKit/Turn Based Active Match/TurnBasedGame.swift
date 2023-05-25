@@ -21,6 +21,12 @@ public protocol TurnBasedGame: ObservableObject {
 	static var defaultRequest: GKMatchRequest { get }
 }
 
+public protocol TurnBasedGameExchange: TurnBasedGame {
+	func receivedExchangeRequest(_ request: GKTurnBasedExchange)
+	func cancelledExchangeRequest(_ exchange: GKTurnBasedExchange)
+	func repliedToExchangeRequest(_ exchange: GKTurnBasedExchange, with replies: [GKTurnBasedExchangeReply])
+}
+
 extension GKTurnBasedMatch.Status: CustomStringConvertible {
 	public var description: String {
 		switch self {

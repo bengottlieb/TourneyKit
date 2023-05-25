@@ -49,6 +49,7 @@ struct TurnBasedGameView: View {
 						}
 					}
 				}
+				.disabled(game.match?.isLocalPlayerPlaying == false)
 				.padding()
 				
 				Spacer()

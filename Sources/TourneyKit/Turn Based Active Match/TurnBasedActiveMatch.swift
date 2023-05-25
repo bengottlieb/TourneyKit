@@ -122,14 +122,17 @@ extension TurnBasedActiveMatch {
 
 	public func player(_ player: GKPlayer, receivedExchangeRequest exchange: GKTurnBasedExchange, in match: GKTurnBasedMatch) {
 		self.match = match
+		(game as? (any TurnBasedGameExchange))?.receivedExchangeRequest(exchange)
 	}
 	
 	public func player(_ player: GKPlayer, receivedExchangeCancellation exchange: GKTurnBasedExchange, in match: GKTurnBasedMatch) {
 		self.match = match
+		(game as? (any TurnBasedGameExchange))?.cancelledExchangeRequest(exchange)
 	}
 	
 	public func player(_ player: GKPlayer, receivedExchangeReplies replies: [GKTurnBasedExchangeReply], forCompletedExchange exchange: GKTurnBasedExchange, in match: GKTurnBasedMatch) {
 		self.match = match
+		(game as? (any TurnBasedGameExchange))?.repliedToExchangeRequest(exchange, with: replies)
 	}
 	
 	public func quitRequest(from player: GKPlayer, in match: GKTurnBasedMatch) {
