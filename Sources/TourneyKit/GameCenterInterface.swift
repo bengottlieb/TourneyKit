@@ -48,8 +48,14 @@ public class GameCenterInterface: ObservableObject {
 			GKAccessPoint.shared.showHighlights = true
 			GKAccessPoint.shared.isActive = true
 			self.isAuthenticated = true
-			DispatchQueue.main.async { self.objectWillChange.send() }
-			publisher.send(true)
+			
+			Task {
+				await MainActor.run {
+					Task { try? await MatchManager.instance.reloadActiveGames() }
+					self.objectWillChange.send()
+					publisher.send(true)
+				}
+			}
 		}
 		
 		authenticationPublisher = publisher.eraseToAnyPublisher()

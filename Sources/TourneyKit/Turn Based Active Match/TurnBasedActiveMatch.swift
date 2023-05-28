@@ -46,9 +46,9 @@ public class TurnBasedActiveMatch<Game: TurnBasedGame>: NSObject, ObservableObje
 		self.manager = matchManager
 	}
 	
-	public var isLocalPlayersTurn: Bool { match.currentParticipant == localParticipant }
-	public var isLocalPlayerPlaying: Bool { localParticipant?.status == .active }
-	public var localParticipant: GKTurnBasedParticipant? { match.participants.first { $0.player == GKLocalPlayer.local }}
+	public var isLocalPlayersTurn: Bool { match.isLocalPlayersTurn }
+	public var isLocalPlayerPlaying: Bool { match.isLocalPlayerPlaying }
+	public var localParticipant: GKTurnBasedParticipant? { match.localParticipant }
 	
 	public func endTurn(nextPlayers: [GKPlayer]? = nil, timeOut: TimeInterval = 60.0) async throws {
 		try await match.endTurn(withNextParticipants: nextParticipants(startingWith: nextPlayers), turnTimeout: timeOut, match: try matchData)

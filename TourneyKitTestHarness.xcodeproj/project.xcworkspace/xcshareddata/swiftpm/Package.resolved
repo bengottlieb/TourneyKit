@@ -1,0 +1,14 @@
+{
+  "pins" : [
+    {
+      "identity" : "tourneykit",
+      "kind" : "remoteSourceControl",
+      "location" : "git@github.com:bengottlieb/TourneyKit.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "37b4f9682fdd1edd01b8a00c23201fbdfaee15fb"
+      }
+    }
+  ],
+  "version" : 2
+}

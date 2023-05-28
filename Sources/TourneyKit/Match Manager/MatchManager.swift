@@ -16,6 +16,7 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 	@Published public var isAutomatching = false
 	@Published public var loadingMatch = false
 	@Published public var pendingMatchRequest: GKMatchRequest?
+	@Published public var activeMatches: [GKTurnBasedMatch] = []
 	public var turnBasedGameClass: (any TurnBasedGame.Type)?
 	
 	@AppStorage("last_match_id") public var lastMatchID: String?
@@ -51,13 +52,17 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 		isAutomatching = false
 	}
 	
+	public func reloadActiveGames() async throws {
+		activeMatches = try await GKTurnBasedMatch.loadMatches()
+		print("Loaded \(activeMatches.count) matches")
+	}
+	
 	@MainActor public func clearRealTimeMatch() {
 		realTimeActiveMatch = nil
 	}
 	
 	@MainActor public func clearTurnBasedMatch() {
 		turnBasedActiveMatch = nil
-		lastMatchID = nil
 	}
 	
 	public func startAutomatching<Game: RealTimeGame>(request: GKMatchRequest, game: Game) async throws {
