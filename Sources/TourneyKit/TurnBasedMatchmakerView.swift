@@ -21,6 +21,17 @@ public struct TurnBasedMatchmakerView: UIViewControllerRepresentable, Identifiab
 		}
 	}
 	
+	public init<Game: TurnBasedGame>(request: GKMatchRequest, game: Game) {
+		_controller = State(initialValue: GKTurnBasedMatchmakerViewController(matchRequest: request))
+		completion = { newMatch in
+			Task {
+				await MainActor.run {
+					MatchManager.instance.load(match: newMatch, game: game)
+				}
+			}
+		}
+	}
+	
 	public init(request: GKMatchRequest, completion: @escaping (GKTurnBasedMatch) -> Void) {
 		_controller = State(initialValue: GKTurnBasedMatchmakerViewController(matchRequest: request))
 		self.completion = completion

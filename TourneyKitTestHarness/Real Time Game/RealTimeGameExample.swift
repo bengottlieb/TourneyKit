@@ -91,7 +91,6 @@ final class RealTimeGameExample: RealTimeGame, ObservableObject {
 		match?.terminate()
 	}
 
-	
 	func didReceive(data: Data, from player: GKPlayer) {
 		do {
 			state = try JSONDecoder().decode(GameState.self, from: data)

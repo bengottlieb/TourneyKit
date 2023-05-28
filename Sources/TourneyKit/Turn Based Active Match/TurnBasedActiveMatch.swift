@@ -27,6 +27,10 @@ public class TurnBasedActiveMatch<Game: TurnBasedGame>: NSObject, ObservableObje
 	public var currentPlayer: GKPlayer? { match.currentParticipant?.player }
 	public var status: GKTurnBasedMatch.Status { isLocalPlayerPlaying ? match.status : .ended }
 	public var isCurrentPlayersTurn: Bool { currentPlayer == GKLocalPlayer.local }
+	public var currentPlayers: [GKPlayer] {
+		match.participants.compactMap { $0.player }
+	}
+
 	public var nextPlayers: [GKPlayer] {
 		guard let current = match.currentParticipant, let currentIndex = match.participants.firstIndex(of: current) else { return match.participants.compactMap { $0.player }}
 		
@@ -81,6 +85,12 @@ extension TurnBasedActiveMatch {
 			guard let payload = game?.gameState else { throw TurnBasedError.noMatchGame }
 			let data = try JSONEncoder().encode(payload)
 			return data
+		}
+	}
+	
+	public var currentGameState: Game.GameState {
+		get throws {
+			try JSONDecoder().decode(Game.GameState.self, from: matchData)
 		}
 	}
 	

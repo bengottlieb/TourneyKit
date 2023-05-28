@@ -9,7 +9,7 @@ import UIKit
 import GameKit
 import Combine
 
-public class GameCenterInterface {
+public class GameCenterInterface: ObservableObject {
 	public static let instance = GameCenterInterface()
 	
 	var authenticationPublisher: AnyPublisher<Bool, Never>!
@@ -48,6 +48,7 @@ public class GameCenterInterface {
 			GKAccessPoint.shared.showHighlights = true
 			GKAccessPoint.shared.isActive = true
 			self.isAuthenticated = true
+			DispatchQueue.main.async { self.objectWillChange.send() }
 			publisher.send(true)
 		}
 		

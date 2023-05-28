@@ -19,7 +19,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		B52A0DB82A1E182800A86780 /* TourneyKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = TourneyKit; sourceTree = "<group>"; };
 		B5AA20DB2A1CC27000499D7D /* TurnBasedGameExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TurnBasedGameExample.swift; sourceTree = "<group>"; };
 		B5D92AC22A1834970009E8C7 /* TourneyKitTestHarness.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TourneyKitTestHarness.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B5D92AC52A1834970009E8C7 /* TourneyKitTestHarnessApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TourneyKitTestHarnessApp.swift; sourceTree = "<group>"; };
@@ -30,6 +29,7 @@
 		B5D92ADA2A1863900009E8C7 /* RealTimeGameExample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealTimeGameExample.swift; sourceTree = "<group>"; };
 		B5D92ADC2A1865760009E8C7 /* RealTimeGameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealTimeGameView.swift; sourceTree = "<group>"; };
 		B5D92AE42A1C24880009E8C7 /* TurnBasedGameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TurnBasedGameView.swift; sourceTree = "<group>"; };
+		B5D92AF32A2121CC0009E8C7 /* TourneyKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = TourneyKit; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,7 +65,7 @@
 		B5D92AB92A1834970009E8C7 = {
 			isa = PBXGroup;
 			children = (
-				B52A0DB82A1E182800A86780 /* TourneyKit */,
+				B5D92AF32A2121CC0009E8C7 /* TourneyKit */,
 				B5D92AC42A1834970009E8C7 /* TourneyKitTestHarness */,
 				B5D92AC32A1834970009E8C7 /* Products */,
 			);

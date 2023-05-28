@@ -13,7 +13,6 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 @MainActor public class MatchManager: NSObject, ObservableObject {
 	public static let instance = MatchManager()
 	
-	@Published public var isAuthenticated = false
 	@Published public var isAutomatching = false
 	@Published public var loadingMatch = false
 	@Published public var pendingMatchRequest: GKMatchRequest?

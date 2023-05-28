@@ -18,6 +18,7 @@ public class RealTimeActiveMatch<Game: RealTimeGame>: NSObject, ObservableObject
 	@Published public var recentErrors: [Error] = []
 	public var allPlayers: [GKPlayer] { [GKLocalPlayer.local] + match.players }
 	public var parentGame: AnyObject? { game }
+	var disconnectedPlayers: [GKPlayer] = []
 
 	init(match: GKMatch, game: Game?, matchManager: MatchManager) {
 		self.match = match
@@ -26,6 +27,13 @@ public class RealTimeActiveMatch<Game: RealTimeGame>: NSObject, ObservableObject
 		
 		self.game = game
 		match.delegate = self
+	}
+	
+	func reInvitePlayer(_ player: GKPlayer) {
+		if disconnectedPlayers.contains(player) { return }
+		
+		disconnectedPlayers.append(player)
+		
 	}
 	
 	public func startMatch() {
@@ -71,7 +79,15 @@ public class RealTimeActiveMatch<Game: RealTimeGame>: NSObject, ObservableObject
 
 	public func match(_ match: GKMatch, player: GKPlayer, didChange state: GKPlayerConnectionState) {
 		Logger.instance.log(.matchChangedPlayerState(match, player, state))
-		if state == .connected { sendPlayerInfo() }
+		switch state {
+		case .connected:
+			sendPlayerInfo()
+			
+		case .disconnected:
+			reInvitePlayer(player)
+			
+		default: break
+		}
 		Task {
 			await MainActor.run {
 				self.game?.playersChanged(to: allPlayers)
@@ -81,6 +97,7 @@ public class RealTimeActiveMatch<Game: RealTimeGame>: NSObject, ObservableObject
 	
 	public func match(_ match: GKMatch, shouldReinviteDisconnectedPlayer player: GKPlayer) -> Bool {
 		Logger.instance.log(.matchShouldReinviteDisconnectedPlayer(match, player))
+		print("shouldReinviteDisconnectedPlayer")
 		 return true
 	}
 
