@@ -12,7 +12,7 @@ public extension GKTurnBasedMatch {
 		currentParticipant == localParticipant
 	}
 	
-	var localParticipent: GKTurnBasedParticipant? {
+	var localParticipant: GKTurnBasedParticipant? {
 		participants.first { $0.player == GKLocalPlayer.local }
 	}
 	
