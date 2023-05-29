@@ -33,6 +33,15 @@ public extension GKTurnBasedMatch {
 	}
 	
 	var isActive: Bool {
-		status != .ended
+		if status == .ended { return false }
+		
+		if localParticipant?.status == .done { return false }
+		return true
+	}
+	
+	func player(withID id: String?) -> GKPlayer? {
+		guard let id else { return nil }
+		
+		return participants.first { $0.player?.tourneyKitID == id }?.player
 	}
 }

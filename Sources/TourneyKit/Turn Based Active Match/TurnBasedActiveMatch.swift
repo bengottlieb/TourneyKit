@@ -17,7 +17,7 @@ public protocol SomeTurnBasedActiveMatch: SomeMatch {
 	func quitRequest(from player: GKPlayer, in match: GKTurnBasedMatch)
 }
 
-enum TurnBasedError: Error { case noMatchGame, triedToEndGameWhenItsNotYourTurn, triedToEndGameWhenNotPlaying }
+enum TurnBasedError: Error { case noMatchGame, triedToEndGameWhenItsNotYourTurn, triedToEndGameWhenNotPlaying, noMatchData }
 
 public class TurnBasedActiveMatch<Game: TurnBasedGame>: NSObject, ObservableObject, SomeTurnBasedActiveMatch {
 	public var match: GKTurnBasedMatch
@@ -51,7 +51,7 @@ public class TurnBasedActiveMatch<Game: TurnBasedGame>: NSObject, ObservableObje
 	public var localParticipant: GKTurnBasedParticipant? { match.localParticipant }
 	
 	public func endTurn(nextPlayers: [GKPlayer]? = nil, timeOut: TimeInterval = 60.0) async throws {
-		try await match.endTurn(withNextParticipants: nextParticipants(startingWith: nextPlayers), turnTimeout: timeOut, match: try matchData)
+		try await match.endTurn(withNextParticipants: nextParticipants(startingWith: nextPlayers), turnTimeout: timeOut, match: try localMatchData)
 		await MatchManager.instance.replace(match)
 		objectWillChange.send()
 	}
@@ -62,16 +62,16 @@ public class TurnBasedActiveMatch<Game: TurnBasedGame>: NSObject, ObservableObje
 		
 		if !isLocalPlayerPlaying {
 			throw TurnBasedError.triedToEndGameWhenNotPlaying
-		} else if next.count <= 1 { 	// no more players, end the game
+		} else if isCurrentPlayersTurn {
+			try await match.participantQuitInTurn(with: outcome, nextParticipants: next, turnTimeout: timeOut, match: try localMatchData)
+		} else {
+			try await match.participantQuitOutOfTurn(with: outcome)
+		}/* else if next.count < 1 { 	// no more players, end the game
 			match.currentParticipant?.matchOutcome = .second
 			next.first?.matchOutcome = .won
 			if !isCurrentPlayersTurn { throw TurnBasedError.triedToEndGameWhenItsNotYourTurn }
-			try await match.endMatchInTurn(withMatch: matchData)
-		} else if isCurrentPlayersTurn {
-			try await match.participantQuitInTurn(with: outcome, nextParticipants: next, turnTimeout: timeOut, match: try matchData)
-		} else {
-			try await match.participantQuitOutOfTurn(with: outcome)
-		}
+			try await match.endMatchInTurn(withMatch: localMatchData)
+		}*/
 		try await reloadMatch()
 	}
 	
@@ -81,7 +81,7 @@ public class TurnBasedActiveMatch<Game: TurnBasedGame>: NSObject, ObservableObje
 }
 
 extension TurnBasedActiveMatch {
-	public var matchData: Data {
+	public var localMatchData: Data {
 		get throws {
 			guard let payload = game?.gameState else { throw TurnBasedError.noMatchGame }
 			let data = try JSONEncoder().encode(payload)
@@ -89,12 +89,25 @@ extension TurnBasedActiveMatch {
 		}
 	}
 	
-	public var currentGameState: Game.GameState {
+	public var remoteMatchData: Data {
 		get throws {
-			try JSONDecoder().decode(Game.GameState.self, from: matchData)
+			guard let data = match.matchData else { throw TurnBasedError.noMatchData }
+			return data
 		}
 	}
 	
+	public var localGameState: Game.GameState {
+		get throws {
+			try JSONDecoder().decode(Game.GameState.self, from: localMatchData)
+		}
+	}
+
+	public var remoteGameState: Game.GameState {
+		get throws {
+			try JSONDecoder().decode(Game.GameState.self, from: remoteMatchData)
+		}
+	}
+
 	public func reloadMatch() async throws {
 		try await match.loadMatchData()
 		if let data = match.matchData {
