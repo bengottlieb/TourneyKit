@@ -52,6 +52,7 @@ public class TurnBasedActiveMatch<Game: TurnBasedGame>: NSObject, ObservableObje
 	
 	public func endTurn(nextPlayers: [GKPlayer]? = nil, timeOut: TimeInterval = 60.0) async throws {
 		try await match.endTurn(withNextParticipants: nextParticipants(startingWith: nextPlayers), turnTimeout: timeOut, match: try matchData)
+		await MatchManager.instance.replace(match)
 		objectWillChange.send()
 	}
 	
@@ -96,6 +97,12 @@ extension TurnBasedActiveMatch {
 	
 	public func reloadMatch() async throws {
 		try await match.loadMatchData()
+		if let data = match.matchData {
+			let newState = try JSONDecoder().decode(Game.GameState.self, from: data)
+
+			game?.received(gameState: newState)
+		}
+		await MatchManager.instance.replace(match)
 	}
 	
 	func nextParticipants(startingWith next: [GKPlayer]?) -> [GKTurnBasedParticipant] {

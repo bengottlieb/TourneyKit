@@ -40,32 +40,38 @@ extension MatchManager /* GKTurnBasedEventListener */ {
 	
 	public func player(_ player: GKPlayer, receivedTurnEventFor match: GKTurnBasedMatch, didBecomeActive: Bool) {
 		Logger.instance.log(.receivedTurnEvent(player, match))
+		replace(match)
 		if match.matchID == turnBasedActiveMatch?.turnBasedMatch?.matchID { turnBasedActiveMatch?.receivedTurn(for: player, didBecomeActive: didBecomeActive, in: match) }
 	}
 	
 	public func player(_ player: GKPlayer, matchEnded match: GKTurnBasedMatch) {
 		Logger.instance.log(.matchEnded(match))
+		replace(match)
 		if match.matchID == turnBasedActiveMatch?.turnBasedMatch?.matchID { turnBasedActiveMatch?.matchEnded(for: player, in: match) }
 	}
 	
 	public func player(_ player: GKPlayer, receivedExchangeRequest exchange: GKTurnBasedExchange, for match: GKTurnBasedMatch) {
 		Logger.instance.log(.receivedExchangeRequest(exchange, match))
+		replace(match)
 		if match.matchID == turnBasedActiveMatch?.turnBasedMatch?.matchID { turnBasedActiveMatch?.player(player, receivedExchangeRequest: exchange, in: match) }
 	}
 	
 	public func player(_ player: GKPlayer, receivedExchangeCancellation exchange: GKTurnBasedExchange, for match: GKTurnBasedMatch) {
 		Logger.instance.log(.receivedExchangeCancellation(exchange, match))
+		replace(match)
 		if match.matchID == turnBasedActiveMatch?.turnBasedMatch?.matchID { turnBasedActiveMatch?.player(player, receivedExchangeCancellation: exchange, in: match) }
 	}
 	
 	public func player(_ player: GKPlayer, receivedExchangeReplies replies: [GKTurnBasedExchangeReply], forCompletedExchange exchange: GKTurnBasedExchange, for match: GKTurnBasedMatch) {
 		Logger.instance.log(.receivedExchangeReplies(replies, exchange, match))
+		replace(match)
 		if match.matchID == turnBasedActiveMatch?.turnBasedMatch?.matchID { turnBasedActiveMatch?.player(player, receivedExchangeReplies: replies, forCompletedExchange: exchange, in: match) }
 
 	}
 	
 	public func player(_ player: GKPlayer, wantsToQuitMatch match: GKTurnBasedMatch) {
 		Logger.instance.log(.wantsToQuitMatch(player, match))
+		replace(match)
 		if match.matchID == turnBasedActiveMatch?.turnBasedMatch?.matchID { turnBasedActiveMatch?.quitRequest(from: player, in: match) }
 
 	}

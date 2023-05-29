@@ -19,4 +19,16 @@ public extension GKTurnBasedMatch {
 	var isLocalPlayerPlaying: Bool {
 		localParticipant?.status == .active
 	}
+	
+	var opponents: [GKPlayer] {
+		participants.compactMap { $0.player }.filter { $0 != GKLocalPlayer.local }
+	}
+	
+	var vsString: String {
+		"vs " + opponents.map { $0.displayName }.joined(separator: ", ")
+	}
+	
+	var lastTurnDate: Date? {
+		participants.compactMap { $0.lastTurnDate }.sorted { $0 < $1 }.first
+	}
 }
