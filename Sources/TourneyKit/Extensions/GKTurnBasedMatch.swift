@@ -31,4 +31,8 @@ public extension GKTurnBasedMatch {
 	var lastTurnDate: Date? {
 		participants.compactMap { $0.lastTurnDate }.sorted { $0 < $1 }.first
 	}
+	
+	var isActive: Bool {
+		status != .ended
+	}
 }

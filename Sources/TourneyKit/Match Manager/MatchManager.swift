@@ -53,7 +53,7 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 	}
 	
 	public func reloadActiveGames() async throws {
-		activeMatches = try await GKTurnBasedMatch.loadMatches().sorted { ($0.lastTurnDate ?? .now) > ($1.lastTurnDate ?? .now) }
+		activeMatches = try await GKTurnBasedMatch.loadMatches().filter { $0.isActive }.sorted { ($0.lastTurnDate ?? .now) > ($1.lastTurnDate ?? .now) }
 		print("Loaded \(activeMatches.count) matches")
 	}
 	
