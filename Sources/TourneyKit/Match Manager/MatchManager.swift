@@ -16,8 +16,10 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 	@Published public var isAutomatching = false
 	@Published public var loadingMatch = false
 	@Published public var pendingMatchRequest: GKMatchRequest?
-	@Published public var activeMatches: [GKTurnBasedMatch] = []
-	@Published public var allMatches: [GKTurnBasedMatch] = []
+	public var activeMatches: [GKTurnBasedMatch] = []
+	public var visibleMatches: [GKTurnBasedMatch] = []
+	public var allMatches: [GKTurnBasedMatch] = []
+	public var hideAbortedMatches = true { didSet { filterMatches(changed: true) }}
 	public var turnBasedGameClass: (any TurnBasedGame.Type)?
 	
 	@AppStorage("last_match_id") public var lastMatchID: String?
@@ -46,6 +48,7 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 	
 	public func load<Game: TurnBasedGame>(match: GKTurnBasedMatch, game: Game) {
 		objectWillChange.send()
+		replace(match)
 		game.clearOut()
 		let active = TurnBasedActiveMatch(match: match, game: game, matchManager: self)
 		self.turnBasedActiveMatch = active
@@ -55,8 +58,15 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 	}
 	
 	public func reloadActiveGames() async throws {
-		allMatches = try await GKTurnBasedMatch.loadMatches().sorted { ($0.lastTurnDate ?? .now) > ($1.lastTurnDate ?? .now) }
+		allMatches = try await GKTurnBasedMatch.loadMatches()
+		filterMatches()
+	}
+	
+	func filterMatches(changed: Bool = false) {
+		visibleMatches = hideAbortedMatches ? allMatches.filter { !$0.wasAborted } : allMatches
+		allMatches = allMatches.sortedByRecency()
 		activeMatches = allMatches.filter { $0.isActive }
+		if changed { objectWillChange.send() }
 	}
 	
 	@MainActor public func clearRealTimeMatch() {
@@ -68,8 +78,16 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 	}
 	
 	func replace(_ match: GKTurnBasedMatch) {
-		if let index = allMatches.firstIndex(where: { $0.matchID == match.matchID }) { activeMatches[index] = match }
-		activeMatches = allMatches.filter { $0.isActive }
+		var hasChanged: Bool
+		if let index = allMatches.firstIndex(where: { $0.matchID == match.matchID }) {
+			hasChanged = match != allMatches[index]
+			allMatches[index] = match
+		} else {
+			hasChanged = true
+			allMatches.append(match)
+		}
+		
+		filterMatches(changed: hasChanged)
 	}
 	
 	public func startAutomatching<Game: RealTimeGame>(request: GKMatchRequest, game: Game) async throws {

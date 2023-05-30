@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  GKTurnBasedMatch.swift
 //  
 //
 //  Created by Ben Gottlieb on 5/28/23.
@@ -39,7 +39,7 @@ public extension GKTurnBasedMatch {
 	}
 	
 	var vsString: String {
-		if opponents.isEmpty { return "--" }
+		if opponents.isEmpty { return isActive ? "Waiting for Opponents" : "--" }
 		return "vs " + opponents.map { $0.displayName }.joined(separator: ", ")
 	}
 	
@@ -60,6 +60,10 @@ public extension GKTurnBasedMatch {
 		return participants.first { $0.player?.tourneyKitID == id }?.player
 	}
 	
+	var wasAborted: Bool {
+		status == .ended && opponents.isEmpty
+	}
+	
 	var statusString: String {
 		if isActive {
 			if let lastTurn = lastTurnDate {
@@ -73,13 +77,42 @@ public extension GKTurnBasedMatch {
 			if localPlayerWon { return "Lost, \(lastPlayed.playedAt)" }
 		}
 		return "Over"
-
+	}
+	
+	override func isEqual(_ object: Any?) -> Bool {
+		guard let other = object as? GKTurnBasedMatch else { return false }
+		
+		if other.matchData != matchData { return false }
+		if other.participants.count != participants.count { return false }
+		for i in participants.indices {
+			if other.participants[i] != participants[i] { return false }
+		}
+		
+		return true
 	}
 }
+
+public extension GKTurnBasedParticipant {
+	override func isEqual(_ object: Any?) -> Bool {
+		guard let other = object as? GKTurnBasedParticipant else { return false }
+		
+		return player == other.player && lastTurnDate == other.lastTurnDate && status == other.status
+	}
+}
+
 extension Date {
 	var playedAt: String {
 		if abs(timeIntervalSinceNow) < 1440 * 60 { return formatted(date: .omitted, time: .shortened) }
 		if abs(timeIntervalSinceNow) < 2880 * 60 { return "Yesterday, \(formatted(date: .omitted, time: .shortened))" }
 		return formatted(date: .abbreviated, time: .omitted)
+	}
+}
+
+extension Array where Element == GKTurnBasedMatch {
+	func sortedByRecency() -> [Element] {
+		sorted { match1, match2 in
+			if match1.isActive != match2.isActive { return match1.isActive }
+			return (match1.lastTurnDate ?? .now) > (match2.lastTurnDate ?? .now)
+		}
 	}
 }
