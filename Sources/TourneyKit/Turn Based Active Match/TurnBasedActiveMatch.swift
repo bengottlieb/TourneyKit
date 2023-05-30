@@ -56,14 +56,19 @@ public class TurnBasedActiveMatch<Game: TurnBasedGame>: NSObject, ObservableObje
 		objectWillChange.send()
 	}
 	
-	public func resign(withOutcome outcome: GKTurnBasedMatch.Outcome, nextPlayers: [GKPlayer]? = nil, timeOut: TimeInterval = 60.0) async throws {
-		try await reloadMatch()
-		let next = nextParticipants(startingWith: nextPlayers)
+	public func endGame(withOutcome outcome: GKTurnBasedMatch.Outcome, nextPlayers: [GKPlayer]? = nil, timeOut: TimeInterval = 60.0) async throws {
+		try? await reloadMatch()
 		
 		if !isLocalPlayerPlaying {
 			throw TurnBasedError.triedToEndGameWhenNotPlaying
 		} else if isCurrentPlayersTurn {
-			try await match.participantQuitInTurn(with: outcome, nextParticipants: next, turnTimeout: timeOut, match: try localMatchData)
+			let next = nextParticipants(startingWith: nextPlayers)
+			if next.isEmpty {
+				localParticipant?.matchOutcome = outcome == .won ? .won : .lost
+				try await match.endMatchInTurn(withMatch: try localMatchData)
+			} else {
+				try await match.participantQuitInTurn(with: outcome, nextParticipants: next, turnTimeout: timeOut, match: try localMatchData)
+			}
 		} else {
 			try await match.participantQuitOutOfTurn(with: outcome)
 		}/* else if next.count < 1 { 	// no more players, end the game

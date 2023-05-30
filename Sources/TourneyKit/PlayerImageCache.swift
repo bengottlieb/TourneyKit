@@ -15,22 +15,26 @@ public class PlayerImageCache {
 	var normalCache: [String: UIImage] = [:]
 	
 	public func cachedImage(for player: GKPlayer, size: GKPlayer.PhotoSize) -> UIImage? {
+		guard let id = player.tourneyKitID else { return nil }
 		switch size {
-		case .small: return smallCache[player.teamPlayerID]
-		case .normal: return normalCache[player.teamPlayerID]
+		case .small: return smallCache[id]
+		case .normal: return normalCache[id]
 		@unknown default:
-			return smallCache[player.teamPlayerID]
+			return smallCache[id]
 		}
 	}
 	
 	public func image(for player: GKPlayer, size: GKPlayer.PhotoSize = .small) async throws -> UIImage {
 		if let cached = cachedImage(for: player, size: size) { return cached }
+
 		let image = try await player.loadPhoto(for: size)
 		
-		switch size {
-		case .small: smallCache[player.teamPlayerID] = image
-		case .normal: normalCache[player.teamPlayerID] = image
-		@unknown default: break
+		if let id = player.tourneyKitID {
+			switch size {
+			case .small: smallCache[id] = image
+			case .normal: normalCache[id] = image
+			@unknown default: break
+			}
 		}
 		return image
 	}

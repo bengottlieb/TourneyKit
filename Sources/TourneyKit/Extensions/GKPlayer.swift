@@ -12,4 +12,8 @@ public extension GKPlayer {
 		playerID
 		//PlayerCache.instance.id(for: self)
 	}
+	
+	var isLocalPlayer: Bool {
+		self == GKLocalPlayer.local
+	}
 }
