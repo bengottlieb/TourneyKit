@@ -59,12 +59,13 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 	
 	public func reloadActiveGames() async throws {
 		allMatches = try await GKTurnBasedMatch.loadMatches()
-		filterMatches()
+		filterMatches(changed: true)
+		print("Fetched \(allMatches.count), \(visibleMatches.count) visible, \(activeMatches.count) active")
 	}
 	
 	func filterMatches(changed: Bool = false) {
-		visibleMatches = hideAbortedMatches ? allMatches.filter { !$0.wasAborted } : allMatches
 		allMatches = allMatches.sortedByRecency()
+		visibleMatches = hideAbortedMatches ? allMatches.filter { !$0.wasAborted } : allMatches
 		activeMatches = allMatches.filter { $0.isActive }
 		if changed { objectWillChange.send() }
 	}
