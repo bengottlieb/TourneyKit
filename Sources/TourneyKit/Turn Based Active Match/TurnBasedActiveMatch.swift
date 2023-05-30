@@ -27,9 +27,8 @@ public class TurnBasedActiveMatch<Game: TurnBasedGame>: NSObject, ObservableObje
 	public var currentPlayer: GKPlayer? { match.currentParticipant?.player }
 	public var status: GKTurnBasedMatch.Status { isLocalPlayerPlaying ? match.status : .ended }
 	public var isCurrentPlayersTurn: Bool { currentPlayer == GKLocalPlayer.local }
-	public var currentPlayers: [GKPlayer] {
-		match.participants.compactMap { $0.player }
-	}
+	public var allPlayers: [GKPlayer] { match.participants.compactMap { $0.player } }
+	public var activePlayers: [GKPlayer] { match.participants.filter { $0.matchOutcome != .none }.compactMap { $0.player } }
 
 	public var nextPlayers: [GKPlayer] {
 		guard let current = match.currentParticipant, let currentIndex = match.participants.firstIndex(of: current) else { return match.participants.compactMap { $0.player }}
