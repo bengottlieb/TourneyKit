@@ -20,3 +20,37 @@ extension GKPlayerConnectionState: CustomStringConvertible {
 		}
 	}
 }
+
+extension GKTurnBasedParticipant.Status: CustomStringConvertible {
+	public var description: String {
+		switch self {
+		case .unknown: return "unknown"
+		case .invited: return "invited"
+		case .declined: return "declined"
+		case .matching: return "matching"
+		case .active: return "active"
+		case .done: return "done"
+		@unknown default: return "@unknown"
+		}
+	}
+}
+
+extension GKTurnBasedMatch.Outcome: CustomStringConvertible {
+	public var description: String {
+		switch self {
+		case .none: return "none"
+		case .quit: return "quit"
+		case .won: return "won"
+		case .lost: return "lost"
+		case .tied: return "tied"
+		case .timeExpired: return "time expired"
+		case .first: return "first"
+		case .second: return "second"
+		case .third: return "third"
+		case .fourth: return "fourth"
+		case .customRange: return "custom"
+		@unknown default: return "@unknown"
+		}
+	}
+}
+

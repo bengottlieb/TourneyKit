@@ -7,6 +7,10 @@
 
 import GameKit
 
+extension GKTurnBasedMatch: Identifiable {
+	public var id: String { matchID }
+}
+
 public extension GKTurnBasedMatch {
 	var localPlayerWon: Bool {
 		guard let localParticipant else { return false }

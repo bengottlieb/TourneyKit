@@ -116,4 +116,12 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 		load(match: match, game: game)
 		loadingMatch = false
 	}
+	
+	func removeMatch(_ match: GKTurnBasedMatch) {
+		if let index = allMatches.firstIndex(where: { $0.matchID == match.matchID }) {
+			allMatches.remove(at: index)
+			filterMatches(changed: true)
+
+		}
+	}
 }

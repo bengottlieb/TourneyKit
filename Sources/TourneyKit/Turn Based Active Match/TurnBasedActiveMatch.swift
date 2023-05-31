@@ -29,7 +29,7 @@ public class TurnBasedActiveMatch<Game: TurnBasedGame>: NSObject, ObservableObje
 	public var isCurrentPlayersTurn: Bool { currentPlayer == GKLocalPlayer.local }
 	public var allPlayers: [GKPlayer] { match.participants.compactMap { $0.player } }
 	public var activePlayers: [GKPlayer] { match.participants.filter { $0.matchOutcome != .none }.compactMap { $0.player } }
-
+	
 	public var nextPlayers: [GKPlayer] {
 		guard let current = match.currentParticipant, let currentIndex = match.participants.firstIndex(of: current) else { return match.participants.compactMap { $0.player }}
 		
@@ -39,12 +39,13 @@ public class TurnBasedActiveMatch<Game: TurnBasedGame>: NSObject, ObservableObje
 		return participants.compactMap { $0.player }
 	}
 	
-	init(match: GKTurnBasedMatch, game: Game?, matchManager: MatchManager) {
+	public init(match: GKTurnBasedMatch, game: Game?, matchManager: MatchManager = MatchManager.instance) {
 		self.match = match
 		self.game = game
 		self.manager = matchManager
 	}
 	
+	public func player(withID id: String) -> GKPlayer? { match.participants.first { $0.player?.tourneyKitID == id }?.player }
 	public var isLocalPlayersTurn: Bool { match.isLocalPlayersTurn }
 	public var isLocalPlayerPlaying: Bool { match.isLocalPlayerPlaying }
 	public var localParticipant: GKTurnBasedParticipant? { match.localParticipant }
@@ -174,6 +175,11 @@ extension TurnBasedActiveMatch {
 		DispatchQueue.main.async {
 			self.game?.playerDropped(player)
 		}
+	}
+	
+	public func removeMatch() async throws {
+		try await match.remove()
+		await MatchManager.instance.removeMatch(match)
 	}
 
 }
