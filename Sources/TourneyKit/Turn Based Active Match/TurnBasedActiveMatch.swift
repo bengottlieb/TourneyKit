@@ -51,7 +51,9 @@ public class TurnBasedActiveMatch<Game: TurnBasedGame>: NSObject, ObservableObje
 	public var localParticipant: GKTurnBasedParticipant? { match.localParticipant }
 	
 	public func endTurn(nextPlayers: [GKPlayer]? = nil, timeOut: TimeInterval = 60.0) async throws {
-		try await match.endTurn(withNextParticipants: nextParticipants(startingWith: nextPlayers), turnTimeout: timeOut, match: try localMatchData)
+		let participants = nextParticipants(startingWith: nextPlayers)
+		print("Ending turn, next: \(participants.map { $0.player?.displayName ?? "Unnamed Player" }.joined(separator: ", "))")
+		try await match.endTurn(withNextParticipants: participants, turnTimeout: timeOut, match: try localMatchData)
 		await MatchManager.instance.replace(match)
 		objectWillChange.send()
 	}
@@ -186,6 +188,6 @@ extension TurnBasedActiveMatch {
 
 extension Array where Element == GKPlayer {
 	func mapToParticpants(in match: GKTurnBasedMatch) -> [GKTurnBasedParticipant] {
-		compactMap { player in match.participants.first(where: { $0 == player })}
+		compactMap { player in match.participants.first(where: { $0.player?.tourneyKitID == player.tourneyKitID })}
 	}
 }

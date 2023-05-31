@@ -21,6 +21,14 @@ public struct TurnBasedMatchInfoView: View {
 			Text("Created: \(match.creationDate.formatted())")
 			Text("Status: \(match.status.description)")
 			Text("Current Player ID: \(match.currentParticipant?.player?.tourneyKitID ?? "--")")
+			if let name = match.currentParticipant?.player?.displayName {
+				HStack {
+					Text("\(name)")
+						.bold()
+					if match.isLocalPlayersTurn { Text("(Me)").bold() }
+				}
+			}
+			
 			Text("Data: \(match.matchData?.count ?? 0) bytes")
 			Text("Message: \(match.message ?? "--")")
 			ForEach(match.participants.indices, id: \.self) { idx in
@@ -39,6 +47,7 @@ public struct TurnBasedMatchInfoView: View {
 				HStack {
 					if let player = participant.player {
 						PlayerLabel(player: player)
+						if player == GKLocalPlayer.local { Text("Me") }
 					}
 					Text("Last Turn: \(participant.lastTurnDate?.formatted() ?? "--")")
 				}

@@ -78,8 +78,8 @@ public class Logger: ObservableObject {
 				return "playerIssuedChallengeWasCompleted"
 			case .didRequestMatch(_):
 				return "didRequestMatch"
-			case .receivedTurnEvent(_, _):
-				return "receivedTurnEvent"
+			case .receivedTurnEvent(let player, let match):
+				return match.isLocalPlayersTurn ? "\(match.currentParticipant?.player?.displayName ?? "Unknown Current"): receivedTurnEvent (local player's turn)" : "\(player.displayName) receivedTurnEvent"
 			case .matchEnded(_):
 				return "matchEnded"
 			case .receivedExchangeRequest(_, _):
