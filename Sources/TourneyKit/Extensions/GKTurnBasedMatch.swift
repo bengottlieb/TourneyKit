@@ -21,13 +21,21 @@ public extension GKTurnBasedMatch {
 		if active.count > 1 { return false }
 		return active.contains(localParticipant)
 	}
-	
+
+	var localPlayerLost: Bool {
+		guard let localParticipant else { return false }
+		let outcome = localParticipant.matchOutcome
+		let winOutcomes: [GKTurnBasedMatch.Outcome] = [.won, .first, .second, .third, .fourth]
+		if (winOutcomes + [.tied, .none]).contains(outcome)  { return false }
+		return true
+	}
+
 	var activeParticipants: [GKTurnBasedParticipant] {
 		participants.filter { $0.matchOutcome == .none }
 	}
 	
 	var isLocalPlayersTurn: Bool {
-		currentParticipant == localParticipant
+		isActive && currentParticipant == localParticipant
 	}
 	
 	var localParticipant: GKTurnBasedParticipant? {
@@ -55,7 +63,7 @@ public extension GKTurnBasedMatch {
 		if status == .ended { return false }
 		
 		if localParticipant?.status == .done { return false }
-		return true
+		return participants.filter { $0.isActive }.count > 1
 	}
 	
 	func player(withID id: String?) -> GKPlayer? {
@@ -97,6 +105,7 @@ public extension GKTurnBasedMatch {
 }
 
 public extension GKTurnBasedParticipant {
+	var isActive: Bool { return matchOutcome == .none }
 	override func isEqual(_ object: Any?) -> Bool {
 		guard let other = object as? GKTurnBasedParticipant else { return false }
 		
