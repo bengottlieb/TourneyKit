@@ -45,7 +45,7 @@ public class TurnBasedActiveMatch<Game: TurnBasedGame>: NSObject, ObservableObje
 		self.manager = matchManager
 	}
 	
-	public func player(withID id: String) -> GKPlayer? { match.participants.first { $0.player?.tourneyKitID == id }?.player }
+	public func player(withTag tag: GKPlayer.PlayerTag?) -> GKPlayer? { match.participants.compactMap { $0.player }[tag] }
 	public var isLocalPlayersTurn: Bool { match.isLocalPlayersTurn }
 	public var isLocalPlayerPlaying: Bool { match.isLocalPlayerPlaying }
 	public var localParticipant: GKTurnBasedParticipant? { match.localParticipant }
@@ -59,17 +59,18 @@ public class TurnBasedActiveMatch<Game: TurnBasedGame>: NSObject, ObservableObje
 	}
 	
 	public func endGame(withOutcome outcome: GKTurnBasedMatch.Outcome, nextPlayers: [GKPlayer]? = nil, timeOut: TimeInterval = 60.0) async throws {
-		try? await reloadMatch()
-		
+		let matchData = try localMatchData
+		try await reloadMatch(loadingData: false)
+
 		if !isLocalPlayerPlaying {
 			throw TurnBasedError.triedToEndGameWhenNotPlaying
 		} else if isCurrentPlayersTurn {
 			let next = nextParticipants(startingWith: nextPlayers)
 			if next.isEmpty {
 				localParticipant?.matchOutcome = outcome == .won ? .won : .lost
-				try await match.endMatchInTurn(withMatch: try localMatchData)
+				try await match.endMatchInTurn(withMatch: matchData)
 			} else {
-				try await match.participantQuitInTurn(with: outcome, nextParticipants: next, turnTimeout: timeOut, match: try localMatchData)
+				try await match.participantQuitInTurn(with: outcome, nextParticipants: next, turnTimeout: timeOut, match: matchData)
 			}
 		} else {
 			try await match.participantQuitOutOfTurn(with: outcome)
@@ -77,7 +78,7 @@ public class TurnBasedActiveMatch<Game: TurnBasedGame>: NSObject, ObservableObje
 			match.currentParticipant?.matchOutcome = .second
 			next.first?.matchOutcome = .won
 			if !isCurrentPlayersTurn { throw TurnBasedError.triedToEndGameWhenItsNotYourTurn }
-			try await match.endMatchInTurn(withMatch: localMatchData)
+			try await match.endMatchInTurn(withMatch: matchData)
 		}*/
 		try await reloadMatch()
 	}
@@ -116,8 +117,12 @@ extension TurnBasedActiveMatch {
 	}
 
 	public func reloadMatch() async throws {
+		try await reloadMatch(loadingData: true)
+	}
+	
+	func reloadMatch(loadingData: Bool) async throws {
 		try await match.loadMatchData()
-		if let data = match.matchData {
+		if loadingData, let data = match.matchData {
 			let newState = try JSONDecoder().decode(Game.GameState.self, from: data)
 
 			game?.received(gameState: newState)
@@ -188,6 +193,30 @@ extension TurnBasedActiveMatch {
 
 extension Array where Element == GKPlayer {
 	func mapToParticpants(in match: GKTurnBasedMatch) -> [GKTurnBasedParticipant] {
-		compactMap { player in match.participants.first(where: { $0.player?.tourneyKitID == player.tourneyKitID })}
+		compactMap { player in match.participants.first(where: { $0.player == player })}
+	}
+	
+	public subscript(tag: GKPlayer.PlayerTag?) -> GKPlayer? {
+		guard let index = map({ $0.playerTag }).firstIndex(tag: tag) else { return nil }
+		return self[index]
+	}
+}
+
+extension Array where Element == GKPlayer.PlayerTag {
+	public func firstIndex(tag: GKPlayer.PlayerTag?) -> Int? {
+		guard let tag else { return nil }
+		for index in indices {
+			if self[index].teamID == tag.teamID { return index }
+		}
+		
+		for index in indices {
+			if self[index].gameID == tag.gameID { return index }
+		}
+		
+		for index in indices {
+			if self[index].alias == tag.alias { return index }
+		}
+		
+		return nil
 	}
 }

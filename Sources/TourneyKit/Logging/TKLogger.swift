@@ -13,7 +13,7 @@ extension GKPlayer {
 		var result = displayName
 		if teamPlayerID.contains(":") { result += ", " + teamPlayerID }
 		if gamePlayerID.contains(":") { result += ", " + gamePlayerID }
-		if let id = tourneyKitID { result += ", " + id }
+		result += ", " + playerTag.description
 		return result
 	}
 }

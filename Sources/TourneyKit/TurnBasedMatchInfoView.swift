@@ -20,7 +20,7 @@ public struct TurnBasedMatchInfoView: View {
 			Text("ID: \(match.matchID)")
 			Text("Created: \(match.creationDate.formatted())")
 			Text("Status: \(match.status.description)")
-			Text("Current Player ID: \(match.currentParticipant?.player?.tourneyKitID ?? "--")")
+			Text("Current Player ID: \(match.currentParticipant?.player?.playerTag.description ?? "--")")
 			if let name = match.currentParticipant?.player?.displayName {
 				HStack {
 					Text("\(name)")
@@ -51,11 +51,17 @@ public struct TurnBasedMatchInfoView: View {
 					}
 					Text("Last Turn: \(participant.lastTurnDate?.formatted() ?? "--")")
 				}
-				Text("ID: ") + Text(participant.player?.tourneyKitID ?? "").bold()
+				if let player = participant.player {
+					Text("ID: ") + Text(player.playerTag.description).bold()
+					Text("\(player.teamPlayerID) / \(player.gamePlayerID)")
+						.font(.caption)
+				}
+				
 				HStack {
 					Text("Outcome: ") + Text("\(participant.matchOutcome.description)")
 							.bold()
-					Text("Status: ") + Text("\(participant.status.description)")						.bold()
+					Text("Status: ") + Text("\(participant.status.description)")
+						.bold()
 				}
 				if let timeout = participant.timeoutDate {
 					Text("Timeout: \(timeout.formatted())")

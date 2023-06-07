@@ -66,10 +66,8 @@ public extension GKTurnBasedMatch {
 		return participants.filter { $0.isActive }.count > 1
 	}
 	
-	func player(withID id: String?) -> GKPlayer? {
-		guard let id else { return nil }
-		
-		return participants.first { $0.player?.tourneyKitID == id }?.player
+	func player(withTag tag: GKPlayer.PlayerTag?) -> GKPlayer? {
+		participants.compactMap { $0.player }[tag]
 	}
 	
 	var wasAborted: Bool {

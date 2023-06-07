@@ -11,16 +11,15 @@ import GameKit
 public class PlayerImageCache {
 	public static let instance = PlayerImageCache()
 	
-	var smallCache: [String: UIImage] = [:]
-	var normalCache: [String: UIImage] = [:]
+	var smallCache: PlayerDictionary<UIImage> = .init()
+	var normalCache: PlayerDictionary<UIImage> = .init()
 	
 	public func cachedImage(for player: GKPlayer, size: GKPlayer.PhotoSize) -> UIImage? {
-		guard let id = player.tourneyKitID else { return nil }
 		switch size {
-		case .small: return smallCache[id]
-		case .normal: return normalCache[id]
+		case .small: return smallCache[player.playerTag]
+		case .normal: return normalCache[player.playerTag]
 		@unknown default:
-			return smallCache[id]
+			return smallCache[player.playerTag]
 		}
 	}
 	
@@ -29,12 +28,10 @@ public class PlayerImageCache {
 
 		let image = try await player.loadPhoto(for: size)
 		
-		if let id = player.tourneyKitID {
-			switch size {
-			case .small: smallCache[id] = image
-			case .normal: normalCache[id] = image
-			@unknown default: break
-			}
+		switch size {
+		case .small: smallCache[player.playerTag] = image
+		case .normal: normalCache[player.playerTag] = image
+		@unknown default: break
 		}
 		return image
 	}
