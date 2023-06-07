@@ -26,10 +26,9 @@ final class TurnBasedGameExample: TurnBasedGame, ObservableObject {
 		self.match = match
 	}
 	
+	func clearOut() { }
+
 	func received(gameState: GameState?) {
-		if let gameState {
-			print("Received game state: \(gameState)")
-		}
 		objectWillChange.send()
 	}
 	
@@ -38,17 +37,17 @@ final class TurnBasedGameExample: TurnBasedGame, ObservableObject {
 			try await match?.endTurn()
 			objectWillChange.send()
 		} catch {
-			print("Failed to end turn: \(error)")
+			appLogger.info("Failed to end turn: \(error)")
 		}
 	}
 	
 	func matchEndedOnGameCenter() {
-		print("Game over, man. Game over!")
+		appLogger.info("Game over, man. Game over!")
 		objectWillChange.send()
 	}
 	
 	func playerDropped(_ player: GKPlayer) {
-		print("\(player.displayName) has dropped the game.")
+		appLogger.info("\(player.displayName) has dropped the game.")
 		objectWillChange.send()
 	}
 }

@@ -52,7 +52,7 @@ public class TurnBasedActiveMatch<Game: TurnBasedGame>: NSObject, ObservableObje
 	
 	public func endTurn(nextPlayers: [GKPlayer]? = nil, timeOut: TimeInterval = 60.0) async throws {
 		let participants = nextParticipants(startingWith: nextPlayers)
-		print("Ending turn, next: \(participants.map { $0.player?.displayName ?? "Unnamed Player" }.joined(separator: ", "))")
+		tourneyLogger.info("Ending turn, next: \(participants.map { $0.player?.displayName ?? "Unnamed Player" }.joined(separator: ", "))")
 		try await match.endTurn(withNextParticipants: participants, turnTimeout: timeOut, match: try localMatchData)
 		await MatchManager.instance.replace(match)
 		objectWillChange.send()
@@ -148,7 +148,7 @@ extension TurnBasedActiveMatch {
 				game?.received(gameState: nil)
 			}
 		} catch {
-			print("Failed to decode Game State: \(error)")
+			tourneyLogger.error("Failed to decode Game State: \(error)")
 		}
 	}
 	

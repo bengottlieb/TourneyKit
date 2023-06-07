@@ -68,7 +68,7 @@ public struct TurnBasedMatchmakerView: UIViewControllerRepresentable, Identifiab
 		}
 
 		public func turnBasedMatchmakerViewController(_ viewController: GKTurnBasedMatchmakerViewController, didFailWithError error: Error) {
-			print("Error when matchmaking: \(error)")
+			tourneyLogger.error("Error when turn-based matchmaking: \(error)")
 			view.dismiss()
 		}
 		

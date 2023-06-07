@@ -8,7 +8,7 @@
 import SwiftUI
 
 public struct LoggerView: View {
-	@ObservedObject var logger = Logger.instance
+	@ObservedObject var logger = TKLogger.instance
 	
 	public init() { }
 	

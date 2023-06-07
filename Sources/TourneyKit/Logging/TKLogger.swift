@@ -1,5 +1,5 @@
 //
-//  Logger.swift
+//  TKLogger.swift
 //  
 //
 //  Created by Ben Gottlieb on 5/21/23.
@@ -18,8 +18,8 @@ extension GKPlayer {
 	}
 }
 
-public class Logger: ObservableObject {
-	public static let instance = Logger()
+public class TKLogger: ObservableObject {
+	public static let instance = TKLogger()
 	var lastMessageAt = Date()
 	
 	#if targetEnvironment(simulator)
@@ -34,7 +34,7 @@ public class Logger: ObservableObject {
 	func log(_ message: Message) {
 		messages.append(message)
 		while messages.count > logDepth { messages.remove(at: 0) }
-		if logMessages { print("🎮 \(message.description)") }
+		if logMessages { tourneyLogger.info("🎮 \(message.description)") }
 		lastMessageAt = Date()
 		DispatchQueue.main.async { self.objectWillChange.send() }
 	}

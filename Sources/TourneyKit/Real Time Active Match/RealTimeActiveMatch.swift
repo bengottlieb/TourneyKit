@@ -73,12 +73,11 @@ public class RealTimeActiveMatch<Game: RealTimeGame>: NSObject, ObservableObject
 	}
 	
 	func send(data: Data, reliably: Bool = true) throws {
-//		print("Sending: \(String(data: data, encoding: .utf8) ?? "something")")
 		try match.sendData(toAllPlayers: data, with: reliably ? .reliable : .unreliable)
 	}
 
 	public func match(_ match: GKMatch, player: GKPlayer, didChange state: GKPlayerConnectionState) {
-		Logger.instance.log(.matchChangedPlayerState(match, player, state))
+		TKLogger.instance.log(.matchChangedPlayerState(match, player, state))
 		switch state {
 		case .connected:
 			sendPlayerInfo()
@@ -96,13 +95,13 @@ public class RealTimeActiveMatch<Game: RealTimeGame>: NSObject, ObservableObject
 	}
 	
 	public func match(_ match: GKMatch, shouldReinviteDisconnectedPlayer player: GKPlayer) -> Bool {
-		Logger.instance.log(.matchShouldReinviteDisconnectedPlayer(match, player))
-		print("shouldReinviteDisconnectedPlayer")
+		TKLogger.instance.log(.matchShouldReinviteDisconnectedPlayer(match, player))
+		tourneyLogger.info("shouldReinviteDisconnectedPlayer")
 		 return true
 	}
 
 	public func match(_ match: GKMatch, didReceive data: Data, forRecipient recipient: GKPlayer, fromRemotePlayer player: GKPlayer) {
-		Logger.instance.log(.matchReceivedData(match, player, data))
+		TKLogger.instance.log(.matchReceivedData(match, player, data))
 		handleIncoming(data: data, from: player)
 	}
 	

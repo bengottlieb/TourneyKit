@@ -66,7 +66,7 @@ struct ContentView: View {
 					DispatchQueue.main.async {
 						GameCenterInterface.instance.showingGameCenterAvatar = false
 						if autoRestoreLastMatch, turnBasedGame == nil {
-							print("Restoring: \(autoRestoreLastMatch)")
+							appLogger.info("Restoring: \(autoRestoreLastMatch)")
 							restore()
 						}
 					}
@@ -106,7 +106,7 @@ struct ContentView: View {
 				try await mgr.restore(game: game)
 				self.turnBasedGame = game
 			} catch {
-				print("Failed to restore game: \(error)")
+				appLogger.info("Failed to restore game: \(error)")
 			}
 		}
 	}

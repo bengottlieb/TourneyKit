@@ -60,7 +60,7 @@ public struct RealTimeMatchmakerView: UIViewControllerRepresentable, Identifiabl
 		}
 
 		public func matchmakerViewController(_ viewController: GKMatchmakerViewController, didFailWithError error: Error) {
-			print("Error when matchmaking: \(error)")
+			tourneyLogger.error("Error when matchmaking: \(error)")
 			view.dismiss()
 		}
 		

@@ -16,31 +16,31 @@ extension RealTimeActiveMatch {
 			switch raw.kind {
 			case .phaseChange:
 				if let full = try? JSONDecoder().decode(MessageMatchPhaseChange.self, from: data) {
-					Logger.instance.log(.matchPhaseChange(match, full.phase))
+					TKLogger.instance.log(.matchPhaseChange(match, full.phase))
 					handleRemotePhaseChange(to: full.phase)
 				}
 				
 			case .state:
 				if let full = try? JSONDecoder().decode(MessageMatchState<Game.GameState>.self, from: data) {
-					Logger.instance.log(.matchStateReceived(match, data))
+					TKLogger.instance.log(.matchStateReceived(match, data))
 					game?.matchStateChanged(to: full.payload)
 				}
 				
 			case .update:
 				if let full = try? JSONDecoder().decode(MessageMatchState<Game.GameUpdate>.self, from: data) {
-					Logger.instance.log(.matchUpateReceived(match, data))
+					TKLogger.instance.log(.matchUpateReceived(match, data))
 					game?.matchUpdated(with: full.payload)
 				}
 				
 			case .playerInfo:
 				if let full = try? JSONDecoder().decode(MessagePlayerInfo.self, from: data) {
-					Logger.instance.log(.playerInfoReceived(match, player, full.name, full.id))
+					TKLogger.instance.log(.playerInfoReceived(match, player, full.name, full.id))
 					PlayerCache.instance.set(name: full.name, id: full.id, for: player)
 				}
 			}
 		} catch {
 			recentErrors.append(error)
-			print("Failed to process a message: \(String(data: data, encoding: .utf8) ?? "--")")
+			tourneyLogger.error("Failed to process a message: \(String(data: data, encoding: .utf8) ?? "--")")
 		}
 	}
 	

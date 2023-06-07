@@ -34,7 +34,7 @@ public class GameCenterInterface: ObservableObject {
 			if let error {
 				self.isAuthenticated = false
 				// If you can’t authenticate the player, disable Game Center features in your game.
-				print("Error: \(error.localizedDescription).")
+				tourneyLogger.error("GameKit Authentication Error: \(error.localizedDescription).")
 				return
 			}
 			

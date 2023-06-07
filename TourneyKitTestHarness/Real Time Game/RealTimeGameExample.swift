@@ -95,7 +95,7 @@ final class RealTimeGameExample: RealTimeGame, ObservableObject {
 		do {
 			state = try JSONDecoder().decode(GameState.self, from: data)
 		} catch {
-			print("Failed to decode incoming data: \(error)")
+			appLogger.error("Failed to decode incoming realtime game data: \(error)")
 		}
 	}
 	

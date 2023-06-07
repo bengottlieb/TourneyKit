@@ -7,6 +7,9 @@
 
 import SwiftUI
 import GameKit
+import OSLog
+
+let tourneyLogger = Logger(subsystem: "TourneyKit", category: "matches")
 
 enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyHaveActiveMatch }
 
@@ -60,7 +63,7 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 	public func reloadActiveGames() async throws {
 		allMatches = try await GKTurnBasedMatch.loadMatches()
 		filterMatches(changed: true)
-		print("Fetched \(allMatches.count), \(visibleMatches.count) visible, \(activeMatches.count) active")
+		tourneyLogger.notice("Fetched \(self.allMatches.count), \(self.visibleMatches.count) visible, \(self.activeMatches.count) active")
 	}
 	
 	func filterMatches(changed: Bool = false) {
@@ -100,7 +103,7 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 			load(match: match, game: game)
 		} catch {
 			isAutomatching = false
-			print("Failed to find match: \(error)")
+			tourneyLogger.error("Failed to find match: \(error)")
 			throw error
 		}
 	}

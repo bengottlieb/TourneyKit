@@ -19,7 +19,7 @@ struct TurnBasedGameView: View {
 			do {
 				try await game.match?.reloadMatch()
 			} catch {
-				print("Failed to reload match: \(error)")
+				appLogger.info("Failed to reload match: \(error)")
 			}
 			isReloading = false
 		}
@@ -42,10 +42,10 @@ struct TurnBasedGameView: View {
 				Button("Resign") {
 					Task {
 						do {
-							try await game.match?.resign(withOutcome: .lost)
+							try await game.match?.endGame(withOutcome: .lost)
 							game.objectWillChange.send()
 						} catch {
-							print("Failed to resign: \(error)")
+							appLogger.info("Failed to resign: \(error)")
 						}
 					}
 				}

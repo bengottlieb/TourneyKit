@@ -7,6 +7,9 @@
 
 import SwiftUI
 import TourneyKit
+import OSLog
+
+let appLogger = Logger(subsystem: "app", category: "info")
 
 @main
 struct TourneyKitTestHarnessApp: App {
