@@ -13,9 +13,9 @@ public struct PlayerInfoView: View {
 	
 	@State var image: UIImage?
 	
-	public init(player: GKPlayer) {
+	public init(player: GKPlayer?) {
 		_image = State(initialValue: PlayerImageCache.instance.cachedImage(for: player, size: .normal))
-		self.player = player
+		self.player = player ?? GKLocalPlayer.local
 	}
 	
 	public var body: some View {

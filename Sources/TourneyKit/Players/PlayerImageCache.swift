@@ -14,7 +14,8 @@ public class PlayerImageCache {
 	var smallCache: PlayerDictionary<UIImage> = .init()
 	var normalCache: PlayerDictionary<UIImage> = .init()
 	
-	public func cachedImage(for player: GKPlayer, size: GKPlayer.PhotoSize) -> UIImage? {
+	public func cachedImage(for player: GKPlayer?, size: GKPlayer.PhotoSize) -> UIImage? {
+		guard let player else { return nil }
 		switch size {
 		case .small: return smallCache[player.playerTag]
 		case .normal: return normalCache[player.playerTag]
@@ -23,7 +24,8 @@ public class PlayerImageCache {
 		}
 	}
 	
-	public func image(for player: GKPlayer, size: GKPlayer.PhotoSize = .small) async throws -> UIImage {
+	public func image(for optionalPlayer: GKPlayer?, size: GKPlayer.PhotoSize = .small) async throws -> UIImage {
+		let player = optionalPlayer ?? GKLocalPlayer.local
 		if let cached = cachedImage(for: player, size: size) { return cached }
 
 		let image = try await player.loadPhoto(for: size)
