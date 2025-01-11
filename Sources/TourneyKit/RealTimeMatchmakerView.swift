@@ -5,6 +5,7 @@
 //  Created by Ben Gottlieb on 5/20/23.
 //
 
+#if canImport(UIKit)
 import SwiftUI
 import GameKit
 
@@ -66,3 +67,4 @@ public struct RealTimeMatchmakerView: UIViewControllerRepresentable, Identifiabl
 		
 	}
 }
+#endif

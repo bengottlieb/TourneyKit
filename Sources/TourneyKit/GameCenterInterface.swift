@@ -5,6 +5,7 @@
 //  Created by Ben Gottlieb on 5/23/23.
 //
 
+#if canImport(UIKit)
 import UIKit
 import GameKit
 import Combine
@@ -67,3 +68,4 @@ public class GameCenterInterface: ObservableObject {
 		return windowScene?.windows.first?.rootViewController
 	}
 }
+#endif

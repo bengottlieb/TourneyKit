@@ -7,14 +7,15 @@
 
 import SwiftUI
 import GameKit
+import CrossPlatformKit
 
 public class PlayerImageCache {
 	public static let instance = PlayerImageCache()
 	
-	var smallCache: PlayerDictionary<UIImage> = .init()
-	var normalCache: PlayerDictionary<UIImage> = .init()
+	var smallCache: PlayerDictionary<UXImage> = .init()
+	var normalCache: PlayerDictionary<UXImage> = .init()
 	
-	public func cachedImage(for player: GKPlayer?, size: GKPlayer.PhotoSize) -> UIImage? {
+	public func cachedImage(for player: GKPlayer?, size: GKPlayer.PhotoSize) -> UXImage? {
 		guard let player else { return nil }
 		switch size {
 		case .small: return smallCache[player.playerTag]
@@ -24,7 +25,7 @@ public class PlayerImageCache {
 		}
 	}
 	
-	public func image(for optionalPlayer: GKPlayer?, size: GKPlayer.PhotoSize = .small) async throws -> UIImage {
+	public func image(for optionalPlayer: GKPlayer?, size: GKPlayer.PhotoSize = .small) async throws -> UXImage {
 		let player = optionalPlayer ?? GKLocalPlayer.local
 		if let cached = cachedImage(for: player, size: size) { return cached }
 

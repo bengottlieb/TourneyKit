@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "TourneyKit",
      platforms: [
-              .macOS(.v11),
+              .macOS(.v12),
               .iOS(.v15),
               .watchOS(.v7)
          ],
@@ -17,11 +17,11 @@ let package = Package(
             targets: ["TourneyKit"]),
     ],
     dependencies: [
-        // Dependencies declare other packages that this package depends on.
+		.package(url: "https://github.com/ios-tooling/CrossPlatformKit.git", from: "1.0.12"),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
         // Targets can depend on other targets in this package, and on products in packages which this package depends on.
-        .target(name: "TourneyKit", dependencies: []),
+        .target(name: "TourneyKit", dependencies: [.product(name: "CrossPlatformKit", package: "CrossPlatformKit"),]),
     ]
 )

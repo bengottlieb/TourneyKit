@@ -7,7 +7,7 @@
 
 import GameKit
 
-extension GKTurnBasedMatch: Identifiable {
+extension GKTurnBasedMatch: @retroactive Identifiable {
 	public var id: String { matchID }
 }
 

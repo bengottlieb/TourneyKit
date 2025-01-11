@@ -5,6 +5,7 @@
 //  Created by Ben Gottlieb on 5/21/23.
 //
 
+#if canImport(UIKit)
 import SwiftUI
 import GameKit
 
@@ -74,3 +75,4 @@ public struct TurnBasedMatchmakerView: UIViewControllerRepresentable, Identifiab
 		
 	}
 }
+#endif

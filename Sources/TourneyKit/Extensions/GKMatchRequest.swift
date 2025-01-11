@@ -8,7 +8,7 @@
 import Foundation
 import GameKit
 
-extension GKMatchRequest: Identifiable {
+extension GKMatchRequest: @retroactive Identifiable {
 	
 }
 

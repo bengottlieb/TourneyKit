@@ -7,11 +7,12 @@
 
 import SwiftUI
 import GameKit
+import CrossPlatformKit
 
 public struct PlayerInfoView: View {
 	let player: GKPlayer
 	
-	@State var image: UIImage?
+	@State var image: UXImage?
 	
 	public init(player: GKPlayer?) {
 		_image = State(initialValue: PlayerImageCache.instance.cachedImage(for: player, size: .normal))
@@ -22,7 +23,7 @@ public struct PlayerInfoView: View {
 		VStack(alignment: .leading) {
 			HStack {
 				if let image {
-					Image(uiImage: image)
+					Image(uxImage: image)
 						.resizable()
 						.aspectRatio(contentMode: .fit)
 						.frame(height: 50)

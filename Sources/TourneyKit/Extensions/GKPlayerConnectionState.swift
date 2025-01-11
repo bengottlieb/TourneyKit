@@ -9,7 +9,7 @@ import Foundation
 import GameKit
 
 
-extension GKPlayerConnectionState: CustomStringConvertible {
+extension GKPlayerConnectionState: @retroactive CustomStringConvertible {
 	public var description: String {
 		switch self {
 		case .connected: return "connected"
@@ -21,7 +21,7 @@ extension GKPlayerConnectionState: CustomStringConvertible {
 	}
 }
 
-extension GKTurnBasedParticipant.Status: CustomStringConvertible {
+extension GKTurnBasedParticipant.Status: @retroactive CustomStringConvertible {
 	public var description: String {
 		switch self {
 		case .unknown: return "unknown"

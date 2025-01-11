@@ -7,10 +7,11 @@
 
 import SwiftUI
 import GameKit
+import CrossPlatformKit
 
 public struct PlayerLabel: View {
 	let player: GKPlayer
-	@State var image: UIImage?
+	@State var image: UXImage?
 	@State var showingDetails = false
 	public init(player: GKPlayer) {
 		_image = State(initialValue: PlayerImageCache.instance.cachedImage(for: player, size: .small))
@@ -20,7 +21,7 @@ public struct PlayerLabel: View {
 	public var body: some View {
 		HStack {
 			if let image {
-				Image(uiImage: image)
+				Image(uxImage: image)
 					.resizable()
 					.aspectRatio(contentMode: .fit)
 					.clipShape(Circle())
