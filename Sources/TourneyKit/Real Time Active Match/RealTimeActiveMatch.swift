@@ -53,7 +53,7 @@ public class RealTimeActiveMatch<Game: RealTimeGame>: NSObject, ObservableObject
 		Task {
 			await MainActor.run {
 				if manager.realTimeActiveMatch === self {
-					manager.clearTurnBasedMatch()
+					manager.clearRealTimeMatch()
 				}
 			}
 		}

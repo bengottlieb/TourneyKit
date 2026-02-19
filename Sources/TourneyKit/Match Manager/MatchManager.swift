@@ -114,10 +114,9 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 		guard !loadingMatch else { throw MatchManagerError.restoreInProgress }
 		guard let id = matchID ?? lastMatchID else { throw MatchManagerError.missingMatchID }
 		loadingMatch = true
+		defer { loadingMatch = false }
 		let match = try await GKTurnBasedMatch.load(withID: id)
-		
 		load(match: match, game: game)
-		loadingMatch = false
 	}
 	
 	func removeMatch(_ match: GKTurnBasedMatch) {
