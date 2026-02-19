@@ -3,23 +3,22 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B50B03DA2F473BBB00B21DD0 /* TourneyKit in Frameworks */ = {isa = PBXBuildFile; productRef = B50B03D92F473BBB00B21DD0 /* TourneyKit */; };
 		B5AA20DC2A1CC27000499D7D /* TurnBasedGameExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5AA20DB2A1CC27000499D7D /* TurnBasedGameExample.swift */; };
 		B5D92AC62A1834970009E8C7 /* TourneyKitTestHarnessApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D92AC52A1834970009E8C7 /* TourneyKitTestHarnessApp.swift */; };
 		B5D92AC82A1834970009E8C7 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D92AC72A1834970009E8C7 /* ContentView.swift */; };
 		B5D92ACA2A1834980009E8C7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B5D92AC92A1834980009E8C7 /* Assets.xcassets */; };
 		B5D92ACD2A1834980009E8C7 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B5D92ACC2A1834980009E8C7 /* Preview Assets.xcassets */; };
-		B5D92AD52A1839120009E8C7 /* TourneyKit in Frameworks */ = {isa = PBXBuildFile; productRef = B5D92AD42A1839120009E8C7 /* TourneyKit */; };
 		B5D92ADB2A1863900009E8C7 /* RealTimeGameExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D92ADA2A1863900009E8C7 /* RealTimeGameExample.swift */; };
 		B5D92ADD2A1865760009E8C7 /* RealTimeGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D92ADC2A1865760009E8C7 /* RealTimeGameView.swift */; };
 		B5D92AE52A1C24880009E8C7 /* TurnBasedGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D92AE42A1C24880009E8C7 /* TurnBasedGameView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		B5060B662A3089D800E538F4 /* TourneyKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = TourneyKit; sourceTree = "<group>"; };
 		B5AA20DB2A1CC27000499D7D /* TurnBasedGameExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TurnBasedGameExample.swift; sourceTree = "<group>"; };
 		B5D92AC22A1834970009E8C7 /* TourneyKitTestHarness.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TourneyKitTestHarness.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B5D92AC52A1834970009E8C7 /* TourneyKitTestHarnessApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TourneyKitTestHarnessApp.swift; sourceTree = "<group>"; };
@@ -37,7 +36,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B5D92AD52A1839120009E8C7 /* TourneyKit in Frameworks */,
+				B50B03DA2F473BBB00B21DD0 /* TourneyKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,7 +64,6 @@
 		B5D92AB92A1834970009E8C7 = {
 			isa = PBXGroup;
 			children = (
-				B5060B662A3089D800E538F4 /* TourneyKit */,
 				B5D92AC42A1834970009E8C7 /* TourneyKitTestHarness */,
 				B5D92AC32A1834970009E8C7 /* Products */,
 			);
@@ -118,7 +116,7 @@
 			);
 			name = TourneyKitTestHarness;
 			packageProductDependencies = (
-				B5D92AD42A1839120009E8C7 /* TourneyKit */,
+				B50B03D92F473BBB00B21DD0 /* TourneyKit */,
 			);
 			productName = TourneyKitTestHarness;
 			productReference = B5D92AC22A1834970009E8C7 /* TourneyKitTestHarness.app */;
@@ -149,7 +147,7 @@
 			);
 			mainGroup = B5D92AB92A1834970009E8C7;
 			packageReferences = (
-				B5D92AD32A1839120009E8C7 /* XCRemoteSwiftPackageReference "TourneyKit" */,
+				B50B03D82F473BBB00B21DD0 /* XCLocalSwiftPackageReference "../TourneyKit" */,
 			);
 			productRefGroup = B5D92AC32A1834970009E8C7 /* Products */;
 			projectDirPath = "";
@@ -388,21 +386,16 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCRemoteSwiftPackageReference section */
-		B5D92AD32A1839120009E8C7 /* XCRemoteSwiftPackageReference "TourneyKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "git@github.com:bengottlieb/TourneyKit.git";
-			requirement = {
-				branch = main;
-				kind = branch;
-			};
+/* Begin XCLocalSwiftPackageReference section */
+		B50B03D82F473BBB00B21DD0 /* XCLocalSwiftPackageReference "../TourneyKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../TourneyKit;
 		};
-/* End XCRemoteSwiftPackageReference section */
+/* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		B5D92AD42A1839120009E8C7 /* TourneyKit */ = {
+		B50B03D92F473BBB00B21DD0 /* TourneyKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B5D92AD32A1839120009E8C7 /* XCRemoteSwiftPackageReference "TourneyKit" */;
 			productName = TourneyKit;
 		};
 /* End XCSwiftPackageProductDependency section */

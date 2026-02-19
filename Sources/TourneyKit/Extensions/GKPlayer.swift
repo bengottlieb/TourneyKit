@@ -10,9 +10,9 @@ import GameKit
 public extension GKPlayer {
 	var playerTag: PlayerTag { PlayerTag(teamID: teamPlayerID, gameID: gamePlayerID, alias: alias) }
 	
-//	var tourneyKitID: String? {
-//		playerID
-//	}
+	var tourneyKitID: String? {
+		playerID
+	}
 	
 	var isLocalPlayer: Bool {
 		self == GKLocalPlayer.local
