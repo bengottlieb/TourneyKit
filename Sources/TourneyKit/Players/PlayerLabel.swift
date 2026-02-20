@@ -14,7 +14,6 @@ public struct PlayerLabel: View {
 	@State var image: UXImage?
 	@State var showingDetails = false
 	public init(player: GKPlayer) {
-		_image = State(initialValue: PlayerImageCache.instance.cachedImage(for: player, size: .small))
 		self.player = player
 	}
 	

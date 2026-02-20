@@ -11,7 +11,7 @@ public extension GKPlayer {
 	var playerTag: PlayerTag { PlayerTag(teamID: teamPlayerID, gameID: gamePlayerID, alias: alias) }
 	
 	var tourneyKitID: String? {
-		playerID
+		gamePlayerID
 	}
 	
 	var isLocalPlayer: Bool {
