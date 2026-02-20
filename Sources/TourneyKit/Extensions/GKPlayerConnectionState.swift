@@ -35,7 +35,7 @@ extension GKTurnBasedParticipant.Status: @retroactive CustomStringConvertible {
 	}
 }
 
-extension GKTurnBasedMatch.Outcome: CustomStringConvertible {
+extension GKTurnBasedMatch.Outcome: @retroactive CustomStringConvertible {
 	public var description: String {
 		switch self {
 		case .none: return "none"

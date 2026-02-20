@@ -8,7 +8,7 @@
 import Foundation
 import GameKit
 
-extension MatchManager: GKLocalPlayerListener { }
+extension MatchManager: @preconcurrency GKLocalPlayerListener { }
 
 extension MatchManager /* GKInviteEventListener */ {
 	public func player(_ player: GKPlayer, didAccept invite: GKInvite) {

@@ -39,7 +39,7 @@ public class TurnBasedActiveMatch<Game: TurnBasedGame>: NSObject, ObservableObje
 		return participants.compactMap { $0.player }
 	}
 	
-	public init(match: GKTurnBasedMatch, game: Game?, matchManager: MatchManager = MatchManager.instance) {
+	public init(match: GKTurnBasedMatch, game: Game?, matchManager: MatchManager) {
 		self.match = match
 		self.game = game
 		self.manager = matchManager

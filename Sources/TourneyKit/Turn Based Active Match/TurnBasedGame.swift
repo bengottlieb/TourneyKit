@@ -28,7 +28,7 @@ public protocol TurnBasedGameExchange: TurnBasedGame {
 	func repliedToExchangeRequest(_ exchange: GKTurnBasedExchange, with replies: [GKTurnBasedExchangeReply])
 }
 
-extension GKTurnBasedMatch.Status: CustomStringConvertible {
+extension GKTurnBasedMatch.Status: @retroactive CustomStringConvertible {
 	public var description: String {
 		switch self {
 		case .unknown: return "unknown"
