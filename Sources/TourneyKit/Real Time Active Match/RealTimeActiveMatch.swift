@@ -14,7 +14,7 @@ import GameKit
 	@ObservationIgnored let manager: MatchManager
 	public private(set) var phase: ActiveMatchPhase = .loading
 	public var recentlyReceivedData: [any MatchMessage] = []
-	@ObservationIgnored var recentDataDepth = 5
+	@ObservationIgnored public var recentDataDepth = 5
 	public var recentErrors: [any Error] = []
 	public var allPlayers: [GKPlayer] { [GKLocalPlayer.local] + match.players }
 	public var parentGame: AnyObject? { game }

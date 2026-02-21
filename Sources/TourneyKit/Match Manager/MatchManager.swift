@@ -26,6 +26,8 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 	public var turnBasedGameClass: (any TurnBasedGame.Type)?
 
 	@ObservationIgnored @AppStorage("last_match_id") public var lastMatchID: String?
+	@ObservationIgnored private var retainedRealTimeGame: AnyObject?
+	@ObservationIgnored private var retainedTurnBasedGame: AnyObject?
 
 	public private(set) var realTimeActiveMatch: SomeMatch?
 	public private(set) var turnBasedActiveMatch: SomeTurnBasedActiveMatch?
@@ -43,13 +45,15 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 	}
 	
 	public func load<Game: RealTimeGame>(match: GKMatch, game: Game) {
+		retainedRealTimeGame = game
 		let active = RealTimeActiveMatch(match: match, game: game, matchManager: self)
 		self.realTimeActiveMatch = active
 		game.loaded(match: active, with: active.allPlayers)
 		isAutomatching = false
 	}
-	
+
 	public func load<Game: TurnBasedGame>(match: GKTurnBasedMatch, game: Game) {
+		retainedTurnBasedGame = game
 		replace(match)
 		game.clearOut()
 		let active = TurnBasedActiveMatch(match: match, game: game, matchManager: self)
@@ -66,17 +70,19 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 	}
 	
 	func filterMatches() {
-		allMatches = allMatches.sortedByRecency()
-		visibleMatches = hideAbortedMatches ? allMatches.filter { !$0.wasAborted } : allMatches
-		activeMatches = allMatches.filter { $0.isActive }
+		let sorted = allMatches.sortedByRecency()
+		visibleMatches = hideAbortedMatches ? sorted.filter { !$0.wasAborted } : sorted
+		activeMatches = sorted.filter { $0.isActive }
 	}
 	
 	@MainActor public func clearRealTimeMatch() {
 		realTimeActiveMatch = nil
+		retainedRealTimeGame = nil
 	}
-	
+
 	@MainActor public func clearTurnBasedMatch() {
 		turnBasedActiveMatch = nil
+		retainedTurnBasedGame = nil
 	}
 	
 	func replace(_ match: GKTurnBasedMatch) {

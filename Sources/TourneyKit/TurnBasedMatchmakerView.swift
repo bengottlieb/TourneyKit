@@ -13,27 +13,23 @@ public struct TurnBasedMatchmakerView: UIViewControllerRepresentable, Identifiab
 	@State var controller: GKTurnBasedMatchmakerViewController
 	public let id = UUID()
 	@Environment(\.dismiss) var dismiss
-	var completion: (GKTurnBasedMatch) -> Void
-	
+	var completion: @MainActor (GKTurnBasedMatch) -> Void
+
 	public init(request: GKMatchRequest, match: Binding<GKTurnBasedMatch?>) {
 		_controller = State(initialValue: GKTurnBasedMatchmakerViewController(matchRequest: request))
 		completion = { newMatch in
 			match.wrappedValue = newMatch
 		}
 	}
-	
+
 	public init<Game: TurnBasedGame>(request: GKMatchRequest, game: Game) {
 		_controller = State(initialValue: GKTurnBasedMatchmakerViewController(matchRequest: request))
 		completion = { newMatch in
-			Task {
-				await MainActor.run {
-					MatchManager.instance.load(match: newMatch, game: game)
-				}
-			}
+			MatchManager.instance.load(match: newMatch, game: game)
 		}
 	}
-	
-	public init(request: GKMatchRequest, completion: @escaping (GKTurnBasedMatch) -> Void) {
+
+	public init(request: GKMatchRequest, completion: @escaping @MainActor (GKTurnBasedMatch) -> Void) {
 		_controller = State(initialValue: GKTurnBasedMatchmakerViewController(matchRequest: request))
 		self.completion = completion
 	}

@@ -71,7 +71,9 @@ public extension GKTurnBasedMatch {
 	}
 	
 	var wasAborted: Bool {
-		status == .ended && opponents.isEmpty
+		guard status == .ended else { return false }
+		let conclusiveOutcomes: [GKTurnBasedMatch.Outcome] = [.won, .lost, .tied, .first, .second, .third, .fourth]
+		return !participants.contains { conclusiveOutcomes.contains($0.matchOutcome) }
 	}
 	
 	var statusString: String {

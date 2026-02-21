@@ -31,11 +31,9 @@ extension MatchManager /* GKTurnBasedEventListener */ {
 			return
 		}
 		
-		DispatchQueue.main.async {
-			let request = gameType.defaultRequest
-			request.recipients = playersToInvite
-			self.pendingMatchRequest = request
-		}
+		let request = gameType.defaultRequest
+		request.recipients = playersToInvite
+		self.pendingMatchRequest = request
 	}
 	
 	public func player(_ player: GKPlayer, receivedTurnEventFor match: GKTurnBasedMatch, didBecomeActive: Bool) {
