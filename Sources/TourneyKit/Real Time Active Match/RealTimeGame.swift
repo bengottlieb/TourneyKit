@@ -19,6 +19,11 @@ import GameKit
 	func matchUpdated(with update: GameUpdate)
 
 	func matchPhaseChanged(to phase: ActiveMatchPhase)
+	func matchFailed(withError error: Error)
+}
+
+public extension RealTimeGame {
+	func matchFailed(withError error: Error) { }
 }
 
 public enum ActiveMatchPhase: String, Codable { case loading, playing, ended

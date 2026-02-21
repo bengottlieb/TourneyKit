@@ -62,6 +62,7 @@ import GameKit
 	public func endMatch() {
 		phase = .ended
 		sendPhaseChangedMessage()
+		terminateLocally()
 	}
 
 	public func terminate() {
@@ -70,6 +71,15 @@ import GameKit
 
 	func send(data: Data, reliably: Bool = true) throws {
 		try match.sendData(toAllPlayers: data, with: reliably ? .reliable : .unreliable)
+	}
+
+	public func match(_ match: GKMatch, didFailWithError error: Error?) {
+		if let error {
+			tourneyLogger.error("Match failed: \(error)")
+			recentErrors.append(error)
+			game?.matchFailed(withError: error)
+		}
+		terminateLocally()
 	}
 
 	public func match(_ match: GKMatch, player: GKPlayer, didChange state: GKPlayerConnectionState) {

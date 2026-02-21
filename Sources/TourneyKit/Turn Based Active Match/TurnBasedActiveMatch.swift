@@ -137,7 +137,7 @@ extension TurnBasedActiveMatch {
 			participants = [match.participants[(index + 1) % match.participants.count]]
 		}
 		if participants?.isEmpty != false { participants = match.participants }
-		return participants!.filter { $0.status == .active || $0.status == .matching }
+		return (participants ?? []).filter { $0.status == .active || $0.status == .matching }
 	}
 }
 
