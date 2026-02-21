@@ -9,7 +9,7 @@ import Foundation
 import GameKit
 
 public class PlayerCache {
-	static let instance = PlayerCache()
+	nonisolated(unsafe) static let instance = PlayerCache()
 	
 	struct Info {
 		let id: String

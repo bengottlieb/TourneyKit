@@ -7,9 +7,9 @@
 
 import SwiftUI
 import GameKit
+import Observation
 
-
-public protocol TurnBasedGame: ObservableObject {
+public protocol TurnBasedGame: Observable, AnyObject {
 	associatedtype GameState: Codable
 	
 	var gameState: GameState { get set }

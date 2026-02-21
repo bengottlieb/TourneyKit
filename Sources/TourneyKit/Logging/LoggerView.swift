@@ -1,6 +1,6 @@
 //
 //  LoggerView.swift
-//  
+//
 //
 //  Created by Ben Gottlieb on 5/21/23.
 //
@@ -8,11 +8,10 @@
 import SwiftUI
 
 public struct LoggerView: View {
-	@ObservedObject var logger = TKLogger.instance
-	
 	public init() { }
-	
+
 	public var body: some View {
+		let logger = TKLogger.instance
 		ScrollView {
 			LazyVStack(alignment: .leading) {
 				ForEach(logger.messages.indices, id: \.self) { idx in

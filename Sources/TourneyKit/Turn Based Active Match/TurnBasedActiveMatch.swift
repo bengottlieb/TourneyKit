@@ -8,7 +8,7 @@
 import Foundation
 import GameKit
 
-public protocol SomeTurnBasedActiveMatch: SomeMatch {
+@MainActor public protocol SomeTurnBasedActiveMatch: SomeMatch {
 	func receivedTurn(for player: GKPlayer, didBecomeActive: Bool, in match: GKTurnBasedMatch)
 	func matchEnded(for player: GKPlayer, in match: GKTurnBasedMatch)
 	func player(_ player: GKPlayer, receivedExchangeRequest exchange: GKTurnBasedExchange, in match: GKTurnBasedMatch)
@@ -19,10 +19,10 @@ public protocol SomeTurnBasedActiveMatch: SomeMatch {
 
 enum TurnBasedError: Error { case noMatchGame, triedToEndGameWhenItsNotYourTurn, triedToEndGameWhenNotPlaying, noMatchData }
 
-public class TurnBasedActiveMatch<Game: TurnBasedGame>: NSObject, ObservableObject, SomeTurnBasedActiveMatch {
+@MainActor @Observable public class TurnBasedActiveMatch<Game: TurnBasedGame>: NSObject, SomeTurnBasedActiveMatch {
 	public var match: GKTurnBasedMatch
-	public weak var game: Game?
-	let manager: MatchManager
+	@ObservationIgnored public weak var game: Game?
+	@ObservationIgnored let manager: MatchManager
 	public var parentGame: AnyObject? { game }
 	public var currentPlayer: GKPlayer? { match.currentParticipant?.player }
 	public var status: GKTurnBasedMatch.Status { isLocalPlayerPlaying ? match.status : .ended }
@@ -54,8 +54,7 @@ public class TurnBasedActiveMatch<Game: TurnBasedGame>: NSObject, ObservableObje
 		let participants = nextParticipants(startingWith: nextPlayers)
 		tourneyLogger.info("Ending turn, next: \(participants.map { $0.player?.displayName ?? "Unnamed Player" }.joined(separator: ", "))")
 		try await match.endTurn(withNextParticipants: participants, turnTimeout: timeOut, match: try localMatchData)
-		await MatchManager.instance.replace(match)
-		objectWillChange.send()
+		MatchManager.instance.replace(match)
 	}
 	
 	public func endGame(withOutcome outcome: GKTurnBasedMatch.Outcome, nextPlayers: [GKPlayer]? = nil, timeOut: TimeInterval = 60.0) async throws {
@@ -127,9 +126,9 @@ extension TurnBasedActiveMatch {
 
 			game?.received(gameState: newState)
 		}
-		await MatchManager.instance.replace(match)
+		MatchManager.instance.replace(match)
 	}
-	
+
 	func nextParticipants(startingWith next: [GKPlayer]?) -> [GKTurnBasedParticipant] {
 		var partipants = next?.mapToParticpants(in: match)
 		if partipants == nil {
@@ -179,14 +178,12 @@ extension TurnBasedActiveMatch {
 	
 	public func quitRequest(from player: GKPlayer, in match: GKTurnBasedMatch) {
 		self.match = match
-		DispatchQueue.main.async {
-			self.game?.playerDropped(player)
-		}
+		self.game?.playerDropped(player)
 	}
 	
 	public func removeMatch() async throws {
 		try await match.remove()
-		await MatchManager.instance.removeMatch(match)
+		MatchManager.instance.removeMatch(match)
 	}
 
 }

@@ -40,8 +40,7 @@ extension RealTimeActiveMatch {
 			}
 		} catch {
 			tourneyLogger.error("Failed to process a message: \(String(data: data, encoding: .utf8) ?? "--")")
-			let error = error
-			Task { @MainActor in self.recentErrors.append(error) }
+			recentErrors.append(error)
 		}
 	}
 	
@@ -58,8 +57,7 @@ extension RealTimeActiveMatch {
 		do {
 			try send(data: data, reliably: reliably)
 		} catch {
-			let error = error
-			Task { @MainActor in self.recentErrors.append(error) }
+			recentErrors.append(error)
 			throw error
 		}
 	}

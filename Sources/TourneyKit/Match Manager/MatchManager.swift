@@ -13,22 +13,22 @@ let tourneyLogger = Logger(subsystem: "TourneyKit", category: "matches")
 
 enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyHaveActiveMatch }
 
-@MainActor public class MatchManager: NSObject, ObservableObject {
+@MainActor @Observable public class MatchManager: NSObject {
 	public static let instance = MatchManager()
-	
-	@Published public var isAutomatching = false
-	@Published public var loadingMatch = false
-	@Published public var pendingMatchRequest: GKMatchRequest?
+
+	public var isAutomatching = false
+	public var loadingMatch = false
+	public var pendingMatchRequest: GKMatchRequest?
 	public var activeMatches: [GKTurnBasedMatch] = []
 	public var visibleMatches: [GKTurnBasedMatch] = []
 	public var allMatches: [GKTurnBasedMatch] = []
-	public var hideAbortedMatches = true { didSet { filterMatches(changed: true) }}
+	public var hideAbortedMatches = true { didSet { filterMatches() }}
 	public var turnBasedGameClass: (any TurnBasedGame.Type)?
-	
-	@AppStorage("last_match_id") public var lastMatchID: String?
 
-	@Published public private(set) var realTimeActiveMatch: SomeMatch?
-	@Published public private(set) var turnBasedActiveMatch: SomeTurnBasedActiveMatch?
+	@ObservationIgnored @AppStorage("last_match_id") public var lastMatchID: String?
+
+	public private(set) var realTimeActiveMatch: SomeMatch?
+	public private(set) var turnBasedActiveMatch: SomeTurnBasedActiveMatch?
 	public var isInRealTimeMatch: Bool { realTimeActiveMatch != nil }
 	
 	override private init() {
@@ -50,7 +50,6 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 	}
 	
 	public func load<Game: TurnBasedGame>(match: GKTurnBasedMatch, game: Game) {
-		objectWillChange.send()
 		replace(match)
 		game.clearOut()
 		let active = TurnBasedActiveMatch(match: match, game: game, matchManager: self)
@@ -62,15 +61,14 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 	
 	public func reloadActiveGames() async throws {
 		allMatches = try await GKTurnBasedMatch.loadMatches()
-		filterMatches(changed: true)
+		filterMatches()
 		tourneyLogger.notice("Fetched \(self.allMatches.count), \(self.visibleMatches.count) visible, \(self.activeMatches.count) active")
 	}
 	
-	func filterMatches(changed: Bool = false) {
+	func filterMatches() {
 		allMatches = allMatches.sortedByRecency()
 		visibleMatches = hideAbortedMatches ? allMatches.filter { !$0.wasAborted } : allMatches
 		activeMatches = allMatches.filter { $0.isActive }
-		if changed { objectWillChange.send() }
 	}
 	
 	@MainActor public func clearRealTimeMatch() {
@@ -82,16 +80,12 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 	}
 	
 	func replace(_ match: GKTurnBasedMatch) {
-		var hasChanged: Bool
 		if let index = allMatches.firstIndex(where: { $0.matchID == match.matchID }) {
-			hasChanged = match != allMatches[index]
 			allMatches[index] = match
 		} else {
-			hasChanged = true
 			allMatches.append(match)
 		}
-		
-		filterMatches(changed: hasChanged)
+		filterMatches()
 	}
 	
 	public func startAutomatching<Game: RealTimeGame>(request: GKMatchRequest, game: Game) async throws {
@@ -122,7 +116,7 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 	func removeMatch(_ match: GKTurnBasedMatch) {
 		if let index = allMatches.firstIndex(where: { $0.matchID == match.matchID }) {
 			allMatches.remove(at: index)
-			filterMatches(changed: true)
+			filterMatches()
 
 		}
 	}

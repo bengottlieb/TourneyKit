@@ -10,10 +10,10 @@ import UIKit
 import GameKit
 import Combine
 
-@MainActor public class GameCenterInterface: ObservableObject {
+@MainActor @Observable public class GameCenterInterface {
 	public static let instance = GameCenterInterface()
 
-	var authenticationPublisher: AnyPublisher<Bool, Never>!
+	@ObservationIgnored var authenticationPublisher: AnyPublisher<Bool, Never>!
 	public var isAuthenticated = false
 
 	public var showingGameCenterAvatar: Bool {
@@ -54,7 +54,6 @@ import Combine
 			Task {
 				await MainActor.run {
 					Task { try? await matchManager.reloadActiveGames() }
-					self.objectWillChange.send()
 					publisher.send(true)
 				}
 			}

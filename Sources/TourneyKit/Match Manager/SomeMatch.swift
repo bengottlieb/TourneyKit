@@ -8,7 +8,7 @@
 import Foundation
 import GameKit
 
-public protocol SomeMatch: AnyObject {
+@MainActor public protocol SomeMatch: AnyObject {
 	var turnBasedMatch: GKTurnBasedMatch? { get }
 	var realTimeMatch: GKMatch? { get }
 	

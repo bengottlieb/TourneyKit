@@ -1,6 +1,6 @@
 //
 //  TKLogger.swift
-//  
+//
 //
 //  Created by Ben Gottlieb on 5/21/23.
 //
@@ -18,40 +18,39 @@ extension GKPlayer {
 	}
 }
 
-public class TKLogger: ObservableObject {
+@MainActor @Observable public class TKLogger {
 	public static let instance = TKLogger()
 	var lastMessageAt = Date()
-	
+
 	#if targetEnvironment(simulator)
 		public var logMessages = true
 	#else
 		public var logMessages = true
 	#endif
 	public var logDepth = 20
-	
+
 	var messages: [Message] = []
-	
+
 	func log(_ message: Message) {
 		messages.append(message)
 		while messages.count > logDepth { messages.remove(at: 0) }
 		if logMessages { tourneyLogger.info("🎮 \(message.description)") }
 		lastMessageAt = Date()
-		DispatchQueue.main.async { self.objectWillChange.send() }
 	}
-	
+
 	enum Message: CustomStringConvertible {
 		case matchReceivedData(GKMatch, GKPlayer, Data), matchChangedPlayerState(GKMatch, GKPlayer, GKPlayerConnectionState), matchFailedWithError(Error), matchShouldReinviteDisconnectedPlayer(GKMatch, GKPlayer)
-		
+
 		case playerAccept(GKPlayer, GKInvite), playerRequestMatch([GKPlayer])
-		
+
 		case playerDidModifySavedGame(GKSavedGame), playerHasConflictingSavedGames(GKPlayer, [GKSavedGame])
 		case playerWantsToPlay(GKPlayer, GKChallenge), playerDidReceiveChallenge(GKPlayer, GKChallenge), playerDidCompleteChallenge(GKPlayer, GKChallenge), playerIssuedChallengeWasCompleted(GKPlayer, GKChallenge, GKPlayer)
 		case didRequestMatch([GKPlayer]), receivedTurnEvent(GKPlayer, GKTurnBasedMatch), matchEnded(GKTurnBasedMatch), receivedExchangeRequest(GKTurnBasedExchange, GKTurnBasedMatch), receivedExchangeCancellation(GKTurnBasedExchange, GKTurnBasedMatch), receivedExchangeReplies([GKTurnBasedExchangeReply], GKTurnBasedExchange, GKTurnBasedMatch), wantsToQuitMatch(GKPlayer, GKTurnBasedMatch)
 		case matchPhaseChange(GKMatch, ActiveMatchPhase), matchStateReceived(GKMatch, Data), matchUpateReceived(GKMatch, Data), playerInfoReceived(GKMatch, GKPlayer, String, String)
-		
+
 		var description: String {
 			switch self {
-				
+
 			case .matchReceivedData(_, let player, let data):
 				return "matchReceivedData \(data.count) bytes from \(player.shortDescription)"
 			case .matchChangedPlayerState(_, let player, let state):
@@ -90,7 +89,7 @@ public class TKLogger: ObservableObject {
 				return "receivedExchangeReplies"
 			case .wantsToQuitMatch(_, _):
 				return "wantsToQuitMatch"
-				
+
 			case .matchPhaseChange(_, let phase):
 				return "matchPhaseChanged to \(phase)"
 			case .matchStateReceived(_, let data):
