@@ -10,37 +10,39 @@ import GameKit
 
 extension RealTimeActiveMatch {
 	func handleIncoming(data: Data, from player: GKPlayer) {
-		do {
-			let raw = try JSONDecoder().decode(RawMessage.self, from: data)
-			
-			switch raw.kind {
-			case .phaseChange:
-				if let full = try? JSONDecoder().decode(MessageMatchPhaseChange.self, from: data) {
-					TKLogger.instance.log(.matchPhaseChange(match, full.phase))
-					handleRemotePhaseChange(to: full.phase)
-				}
-				
-			case .state:
-				if let full = try? JSONDecoder().decode(MessageMatchState<Game.GameState>.self, from: data) {
-					TKLogger.instance.log(.matchStateReceived(match, data))
-					game?.matchStateChanged(to: full.payload)
-				}
-				
-			case .update:
-				if let full = try? JSONDecoder().decode(MessageMatchState<Game.GameUpdate>.self, from: data) {
-					TKLogger.instance.log(.matchUpateReceived(match, data))
-					game?.matchUpdated(with: full.payload)
-				}
-				
-			case .playerInfo:
-				if let full = try? JSONDecoder().decode(MessagePlayerInfo.self, from: data) {
-					TKLogger.instance.log(.playerInfoReceived(match, player, full.name, full.id))
-					PlayerCache.instance.set(name: full.name, id: full.id, for: player)
-				}
+		guard let raw = try? JSONDecoder().decode(RawMessage.self, from: data) else {
+			game?.didReceive(data: data, from: player)
+			return
+		}
+
+		switch raw.kind {
+		case .phaseChange:
+			if let full = try? JSONDecoder().decode(MessageMatchPhaseChange.self, from: data) {
+				TKLogger.instance.log(.matchPhaseChange(match, full.phase))
+				handleRemotePhaseChange(to: full.phase)
 			}
-		} catch {
-			tourneyLogger.error("Failed to process a message: \(String(data: data, encoding: .utf8) ?? "--")")
-			recentErrors.append(error)
+
+		case .state:
+			if let full = try? JSONDecoder().decode(MessageMatchState<Game.GameState>.self, from: data) {
+				TKLogger.instance.log(.matchStateReceived(match, data))
+				game?.matchStateChanged(to: full.payload)
+				recentlyReceivedData.append(full)
+				if recentlyReceivedData.count > recentDataDepth { recentlyReceivedData.removeFirst() }
+			}
+
+		case .update:
+			if let full = try? JSONDecoder().decode(MessageMatchState<Game.GameUpdate>.self, from: data) {
+				TKLogger.instance.log(.matchUpateReceived(match, data))
+				game?.matchUpdated(with: full.payload)
+				recentlyReceivedData.append(full)
+				if recentlyReceivedData.count > recentDataDepth { recentlyReceivedData.removeFirst() }
+			}
+
+		case .playerInfo:
+			if let full = try? JSONDecoder().decode(MessagePlayerInfo.self, from: data) {
+				TKLogger.instance.log(.playerInfoReceived(match, player, full.name, full.id))
+				PlayerCache.instance.set(name: full.name, id: full.id, for: player)
+			}
 		}
 	}
 	

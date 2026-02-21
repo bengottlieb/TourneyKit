@@ -66,7 +66,7 @@ enum TurnBasedError: Error { case noMatchGame, triedToEndGameWhenItsNotYourTurn,
 		} else if isCurrentPlayersTurn {
 			let next = nextParticipants(startingWith: nextPlayers)
 			if next.isEmpty {
-				localParticipant?.matchOutcome = outcome == .won ? .won : .lost
+				localParticipant?.matchOutcome = outcome
 				try await match.endMatchInTurn(withMatch: matchData)
 			} else {
 				try await match.participantQuitInTurn(with: outcome, nextParticipants: next, turnTimeout: timeOut, match: matchData)
@@ -130,14 +130,14 @@ extension TurnBasedActiveMatch {
 	}
 
 	func nextParticipants(startingWith next: [GKPlayer]?) -> [GKTurnBasedParticipant] {
-		var partipants = next?.mapToParticpants(in: match)
-		if partipants == nil {
+		var participants = next?.mapToParticipants(in: match)
+		if participants == nil {
 			guard let current = match.currentParticipant, let index = match.participants.firstIndex(of: current) else { return [] }
 			
-			partipants = [match.participants[(index + 1) % match.participants.count]]
+			participants = [match.participants[(index + 1) % match.participants.count]]
 		}
-		if partipants?.isEmpty != false { partipants = match.participants }
-		return partipants!.filter { $0.status == .active || $0.status == .matching }
+		if participants?.isEmpty != false { participants = match.participants }
+		return participants!.filter { $0.status == .active || $0.status == .matching }
 	}
 }
 
@@ -189,7 +189,7 @@ extension TurnBasedActiveMatch {
 }
 
 extension Array where Element == GKPlayer {
-	func mapToParticpants(in match: GKTurnBasedMatch) -> [GKTurnBasedParticipant] {
+	func mapToParticipants(in match: GKTurnBasedMatch) -> [GKTurnBasedParticipant] {
 		compactMap { player in match.participants.first(where: { $0.player == player })}
 	}
 	

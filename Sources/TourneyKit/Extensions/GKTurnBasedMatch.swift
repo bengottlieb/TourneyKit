@@ -56,7 +56,7 @@ public extension GKTurnBasedMatch {
 	}
 	
 	var lastTurnDate: Date? {
-		participants.compactMap { $0.lastTurnDate }.sorted { $0 < $1 }.first
+		participants.compactMap { $0.lastTurnDate }.sorted { $0 > $1 }.first
 	}
 	
 	var isActive: Bool {
@@ -84,20 +84,22 @@ public extension GKTurnBasedMatch {
 		
 		if let lastPlayed = lastTurnDate {
 			if localPlayerWon { return "Won, \(lastPlayed.playedAt)" }
-			if localPlayerWon { return "Lost, \(lastPlayed.playedAt)" }
+			if localPlayerLost { return "Lost, \(lastPlayed.playedAt)" }
 		}
 		return "Over"
 	}
 	
 	override func isEqual(_ object: Any?) -> Bool {
 		guard let other = object as? GKTurnBasedMatch else { return false }
-		
+
+		if other.matchID != matchID { return false }
+		if other.status != status { return false }
 		if other.matchData != matchData { return false }
 		if other.participants.count != participants.count { return false }
 		for i in participants.indices {
 			if other.participants[i] != participants[i] { return false }
 		}
-		
+
 		return true
 	}
 }
