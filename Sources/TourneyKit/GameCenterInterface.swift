@@ -59,7 +59,7 @@ import GameKit
 
 	var rootViewController: UIViewController? {
 		let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
-		return windowScene?.windows.first?.rootViewController
+		return windowScene?.keyWindow?.rootViewController
 	}
 }
 #endif

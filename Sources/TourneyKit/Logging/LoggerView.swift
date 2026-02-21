@@ -17,7 +17,7 @@ public struct LoggerView: View {
 				ForEach(logger.messages.indices, id: \.self) { idx in
 					let text = logger.messages[idx].description
 					Text(text)
-						.foregroundColor(.white)
+						.foregroundStyle(.white)
 				}
 				.id(logger.lastMessageAt)
 			}
