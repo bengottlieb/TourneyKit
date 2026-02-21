@@ -11,7 +11,7 @@ import GameKit
 
 public struct TurnBasedMatchmakerView: UIViewControllerRepresentable, Identifiable {
 	@State var controller: GKTurnBasedMatchmakerViewController
-	public var id: NSObject { controller }
+	public let id = UUID()
 	@Environment(\.dismiss) var dismiss
 	var completion: (GKTurnBasedMatch) -> Void
 	

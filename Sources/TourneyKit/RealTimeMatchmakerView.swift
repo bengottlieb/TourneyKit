@@ -12,7 +12,7 @@ import GameKit
 public struct RealTimeMatchmakerView: UIViewControllerRepresentable, Identifiable {
 	@State var controller: GKMatchmakerViewController
 	@Binding var match: GKMatch?
-	public var id: NSObject { controller }
+	public let id = UUID()
 	@Environment(\.dismiss) var dismiss
 	
 	public init?(request: GKMatchRequest, match: Binding<GKMatch?>) {
