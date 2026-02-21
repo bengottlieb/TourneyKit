@@ -24,6 +24,9 @@ public struct PlayerAvatar: View {
 					.resizable()
 					.aspectRatio(contentMode: .fit)
 					.clipShape(Circle())
+			} else {
+				Circle()
+					.fill(.secondary.opacity(0.3))
 			}
 			Text(player.displayName)
 		}

@@ -33,7 +33,7 @@ public struct PlayerLabel: View {
 		}
 		.task {
 			if image == nil {
-				image = try? await PlayerImageCache.instance.image(for: player, size: .normal)
+				image = try? await PlayerImageCache.instance.image(for: player, size: .small)
 			}
 		}
 		.popover(isPresented: $showingDetails) {
