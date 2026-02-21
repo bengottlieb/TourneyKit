@@ -25,7 +25,7 @@ struct ContentView: View {
 			} else if game.isStarted {
 				RealTimeGameView(game: game)
 			} else {
-				Text("\(GKLocalPlayer.local.displayName) - \(GKLocalPlayer.local.tourneyKitID ?? "--")")
+				Text("\(GKLocalPlayer.local.displayName) - \(GKLocalPlayer.local.gamePlayerID)")
 				Spacer()
 				
 				Text("Real Time Matches")

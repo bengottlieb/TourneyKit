@@ -17,7 +17,7 @@ import GameKit
 	func quitRequest(from player: GKPlayer, in match: GKTurnBasedMatch)
 }
 
-enum TurnBasedError: Error { case noMatchGame, triedToEndGameWhenItsNotYourTurn, triedToEndGameWhenNotPlaying, noMatchData }
+enum TurnBasedError: Error { case noMatchGame, triedToEndGameWhenNotPlaying, noMatchData }
 
 @MainActor @Observable public class TurnBasedActiveMatch<Game: TurnBasedGame>: NSObject, SomeTurnBasedActiveMatch {
 	public var match: GKTurnBasedMatch
@@ -73,12 +73,7 @@ enum TurnBasedError: Error { case noMatchGame, triedToEndGameWhenItsNotYourTurn,
 			}
 		} else {
 			try await match.participantQuitOutOfTurn(with: outcome)
-		}/* else if next.count < 1 { 	// no more players, end the game
-			match.currentParticipant?.matchOutcome = .second
-			next.first?.matchOutcome = .won
-			if !isCurrentPlayersTurn { throw TurnBasedError.triedToEndGameWhenItsNotYourTurn }
-			try await match.endMatchInTurn(withMatch: matchData)
-		}*/
+		}
 		try await reloadMatch()
 	}
 	

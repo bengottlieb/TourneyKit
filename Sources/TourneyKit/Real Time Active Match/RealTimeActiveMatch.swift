@@ -18,7 +18,6 @@ import GameKit
 	public var recentErrors: [any Error] = []
 	public var allPlayers: [GKPlayer] { [GKLocalPlayer.local] + match.players }
 	public var parentGame: AnyObject? { game }
-	var disconnectedPlayers: [GKPlayer] = []
 
 	init(match: GKMatch, game: Game?, matchManager: MatchManager) {
 		self.match = match
@@ -27,13 +26,6 @@ import GameKit
 
 		self.game = game
 		match.delegate = self
-	}
-
-	func reInvitePlayer(_ player: GKPlayer) {
-		if disconnectedPlayers.contains(player) { return }
-
-		disconnectedPlayers.append(player)
-
 	}
 
 	public func startMatch() {
@@ -87,9 +79,6 @@ import GameKit
 		switch state {
 		case .connected:
 			sendPlayerInfo()
-
-		case .disconnected:
-			reInvitePlayer(player)
 
 		default: break
 		}
