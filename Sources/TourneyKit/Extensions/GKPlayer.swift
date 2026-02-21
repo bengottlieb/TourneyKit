@@ -13,6 +13,10 @@ public extension GKPlayer {
 	var isLocalPlayer: Bool {
 		self == GKLocalPlayer.local
 	}
+	
+	var tourneyKitID: String? {
+		gamePlayerID
+	}
 }
 
 extension GKPlayer {
