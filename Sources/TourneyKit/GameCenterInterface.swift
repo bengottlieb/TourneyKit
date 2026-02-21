@@ -1,6 +1,6 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Ben Gottlieb on 5/23/23.
 //
@@ -8,12 +8,11 @@
 #if canImport(UIKit)
 import UIKit
 import GameKit
-import Combine
 
 @MainActor @Observable public class GameCenterInterface {
 	public static let instance = GameCenterInterface()
 
-	@ObservationIgnored var authenticationPublisher: AnyPublisher<Bool, Never>!
+	@ObservationIgnored private var authTask: Task<Bool, Never>?
 	public var isAuthenticated = false
 
 	public var showingGameCenterAvatar: Bool {
@@ -21,46 +20,41 @@ import Combine
 		set { GKAccessPoint.shared.isActive = newValue }
 	}
 
-	@discardableResult public func authenticate() -> AnyPublisher<Bool, Never> {
-		if let authenticationPublisher { return authenticationPublisher }
-		let publisher = CurrentValueSubject<Bool, Never>(false)
+	@discardableResult public func authenticate() async -> Bool {
+		if isAuthenticated { return true }
+		if let authTask { return await authTask.value }
+
 		let matchManager = MatchManager.instance
-
-		GKLocalPlayer.local.authenticateHandler = { viewController, error in
-			if let viewController = viewController {
-				// If the view controller is non-nil, present it to the player so they can
-				// perform some necessary action to complete authentication.
-				self.rootViewController?.present(viewController, animated: true) { }
-				return
-			}
-			if let error {
-				self.isAuthenticated = false
-				// If you can’t authenticate the player, disable Game Center features in your game.
-				tourneyLogger.error("GameKit Authentication Error: \(error.localizedDescription).")
-				return
-			}
-
-			PlayerCache.instance.set(name: GKLocalPlayer.local.displayName, id: GKLocalPlayer.local.teamPlayerID, for: GKLocalPlayer.local)
-
-			// Register for real-time invitations from other players.
-			GKLocalPlayer.local.register(matchManager)
-
-			// Add an access point to the interface.
-			GKAccessPoint.shared.location = .topLeading
-			GKAccessPoint.shared.showHighlights = true
-			GKAccessPoint.shared.isActive = true
-			self.isAuthenticated = true
-
-			Task {
-				await MainActor.run {
-					Task { try? await matchManager.reloadActiveGames() }
-					publisher.send(true)
+		let newTask = Task { () -> Bool in
+			await withCheckedContinuation { continuation in
+				var resumed = false
+				GKLocalPlayer.local.authenticateHandler = { viewController, error in
+					MainActor.assumeIsolated {
+						if let viewController {
+							self.rootViewController?.present(viewController, animated: true)
+							return
+						}
+						if let error {
+							self.isAuthenticated = false
+							tourneyLogger.error("GameKit Authentication Error: \(error.localizedDescription).")
+							if !resumed { resumed = true; continuation.resume(returning: false) }
+							return
+						}
+						PlayerCache.instance.set(name: GKLocalPlayer.local.displayName, id: GKLocalPlayer.local.teamPlayerID, for: GKLocalPlayer.local)
+						GKLocalPlayer.local.register(matchManager)
+						GKAccessPoint.shared.location = .topLeading
+						GKAccessPoint.shared.showHighlights = true
+						GKAccessPoint.shared.isActive = true
+						self.isAuthenticated = true
+						Task { try? await matchManager.reloadActiveGames() }
+						if !resumed { resumed = true; continuation.resume(returning: true) }
+					}
 				}
 			}
 		}
 
-		authenticationPublisher = publisher.eraseToAnyPublisher()
-		return authenticationPublisher
+		authTask = newTask
+		return await newTask.value
 	}
 
 	var rootViewController: UIViewController? {

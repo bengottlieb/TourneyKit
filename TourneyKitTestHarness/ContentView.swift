@@ -8,9 +8,6 @@
 import SwiftUI
 import TourneyKit
 import GameKit
-import Combine
-
-
 struct ContentView: View {
 	@State var game = RealTimeGameExample()
 	@State var turnBasedGame: TurnBasedGameExample?
@@ -19,7 +16,6 @@ struct ContentView: View {
 	@State var match: GKMatch?
 	@State var showingTurnBasedUI = false
 	@AppStorage("auto_restore_last_match") var autoRestoreLastMatch = false
-	@State var authenticationPublisher: AnyCancellable?
 	
 	var body: some View {
 		@Bindable var mgr = mgr
@@ -61,17 +57,13 @@ struct ContentView: View {
 			Spacer()
 		}
 		.padding()
-		.onAppear {
-			authenticationPublisher = GameCenterInterface.instance.authenticate()
-				.sink { _ in
-					DispatchQueue.main.async {
-						GameCenterInterface.instance.showingGameCenterAvatar = false
-						if autoRestoreLastMatch, turnBasedGame == nil {
-							appLogger.info("Restoring: \(autoRestoreLastMatch)")
-							restore()
-						}
-					}
-				}
+		.task {
+			await GameCenterInterface.instance.authenticate()
+			GameCenterInterface.instance.showingGameCenterAvatar = false
+			if autoRestoreLastMatch, turnBasedGame == nil {
+				appLogger.info("Restoring: \(autoRestoreLastMatch)")
+				restore()
+			}
 		}
 		.sheet(item: $matchView) { view in
 			view.edgesIgnoringSafeArea(.all)
