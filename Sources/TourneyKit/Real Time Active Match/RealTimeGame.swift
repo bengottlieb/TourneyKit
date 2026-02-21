@@ -8,7 +8,7 @@
 import Foundation
 import GameKit
 
-public protocol RealTimeGame: AnyObject {
+@MainActor public protocol RealTimeGame: AnyObject {
 	associatedtype GameState: Codable
 	associatedtype GameUpdate: Codable
 	

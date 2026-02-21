@@ -14,7 +14,7 @@ import Combine
 struct ContentView: View {
 	@State var game = RealTimeGameExample()
 	@State var turnBasedGame: TurnBasedGameExample?
-	@EnvironmentObject var mgr: MatchManager
+	@Environment(MatchManager.self) var mgr
 	@State var matchView: RealTimeMatchmakerView?
 	@State var match: GKMatch?
 	@State var showingTurnBasedUI = false
@@ -22,6 +22,7 @@ struct ContentView: View {
 	@State var authenticationPublisher: AnyCancellable?
 	
 	var body: some View {
+		@Bindable var mgr = mgr
 		VStack(spacing: 5) {
 			if let turnBased = mgr.turnBasedActiveMatch?.parentGame as? TurnBasedGameExample {
 				TurnBasedGameView(game: turnBased)
@@ -82,9 +83,9 @@ struct ContentView: View {
 			}
 			.edgesIgnoringSafeArea(.all)
 		}
-		.onChange(of: match) { newValue in
-			if let newValue {
-				mgr.load(match: newValue, game: game)
+		.onChange(of: match) { oldMatch, newMatch in
+			if let newMatch {
+				mgr.load(match: newMatch, game: game)
 			}
 		}
 	}

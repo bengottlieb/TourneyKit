@@ -42,9 +42,9 @@ public struct RealTimeMatchmakerView: UIViewControllerRepresentable, Identifiabl
 		Coordinator(view: self)
 	}
 	
-	public class Coordinator: NSObject, GKMatchmakerViewControllerDelegate {
+	@MainActor public class Coordinator: NSObject, @preconcurrency GKMatchmakerViewControllerDelegate {
 		let view: RealTimeMatchmakerView
-		
+
 		init(view: RealTimeMatchmakerView) {
 			self.view = view
 			super.init()
@@ -54,7 +54,7 @@ public struct RealTimeMatchmakerView: UIViewControllerRepresentable, Identifiabl
 		public func matchmakerViewControllerWasCancelled(_ viewController: GKMatchmakerViewController) {
 			view.dismiss()
 		}
-		
+
 		public func matchmakerViewController(_ viewController: GKMatchmakerViewController, didFind match: GKMatch) {
 			view.match = match
 			view.dismiss()
@@ -64,7 +64,7 @@ public struct RealTimeMatchmakerView: UIViewControllerRepresentable, Identifiabl
 			tourneyLogger.error("Error when matchmaking: \(error)")
 			view.dismiss()
 		}
-		
+
 	}
 }
 #endif

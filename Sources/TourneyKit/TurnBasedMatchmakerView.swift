@@ -50,9 +50,9 @@ public struct TurnBasedMatchmakerView: UIViewControllerRepresentable, Identifiab
 		Coordinator(view: self)
 	}
 	
-	public class Coordinator: NSObject, GKTurnBasedMatchmakerViewControllerDelegate {
+	@MainActor public class Coordinator: NSObject, @preconcurrency GKTurnBasedMatchmakerViewControllerDelegate {
 		let view: TurnBasedMatchmakerView
-		
+
 		init(view: TurnBasedMatchmakerView) {
 			self.view = view
 			super.init()
@@ -62,7 +62,7 @@ public struct TurnBasedMatchmakerView: UIViewControllerRepresentable, Identifiab
 		public func turnBasedMatchmakerViewControllerWasCancelled(_ viewController: GKTurnBasedMatchmakerViewController) {
 			view.dismiss()
 		}
-		
+
 		public func turnBasedMatchmakerViewController(_ viewController: GKTurnBasedMatchmakerViewController, didFind match: GKTurnBasedMatch) {
 			view.completion(match)
 			view.dismiss()
@@ -72,7 +72,7 @@ public struct TurnBasedMatchmakerView: UIViewControllerRepresentable, Identifiab
 			tourneyLogger.error("Error when turn-based matchmaking: \(error)")
 			view.dismiss()
 		}
-		
+
 	}
 }
 #endif
