@@ -1,5 +1,5 @@
 //
-//  RealTimeGame.swift
+//  RealTimeMatch.swift
 //  
 //
 //  Created by Ben Gottlieb on 5/20/23.
@@ -8,7 +8,7 @@
 import Foundation
 import GameKit
 
-@MainActor public protocol RealTimeGame: AnyObject {
+@MainActor public protocol RealTimeMatch: AnyObject {
 	associatedtype GameState: Codable
 	associatedtype GameUpdate: Codable
 	
@@ -22,7 +22,7 @@ import GameKit
 	func matchFailed(withError error: Error)
 }
 
-public extension RealTimeGame {
+public extension RealTimeMatch {
 	func matchFailed(withError error: Error) { }
 }
 

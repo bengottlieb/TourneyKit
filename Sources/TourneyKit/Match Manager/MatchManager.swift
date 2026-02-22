@@ -26,7 +26,7 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 	public var turnBasedGameClass: (any TurnBasedMatch.Type)?
 
 	@ObservationIgnored @AppStorage("last_match_id") public var lastMatchID: String?
-	@ObservationIgnored private var retainedRealTimeGame: AnyObject?
+	@ObservationIgnored private var retainedRealTimeMatch: AnyObject?
 	@ObservationIgnored private var retainedTurnBasedMatch: AnyObject?
 
 	public private(set) var realTimeActiveMatch: SomeMatch?
@@ -44,8 +44,8 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 		isAutomatching = false
 	}
 	
-	public func load<Game: RealTimeGame>(match: GKMatch, game: Game) {
-		retainedRealTimeGame = game
+	public func load<Game: RealTimeMatch>(match: GKMatch, game: Game) {
+		retainedRealTimeMatch = game
 		let active = RealTimeActiveMatch(match: match, game: game, matchManager: self)
 		self.realTimeActiveMatch = active
 		game.loaded(match: active, with: active.allPlayers)
@@ -77,7 +77,7 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 	
 	@MainActor public func clearRealTimeMatch() {
 		realTimeActiveMatch = nil
-		retainedRealTimeGame = nil
+		retainedRealTimeMatch = nil
 	}
 
 	@MainActor public func clearTurnBasedMatch() {
@@ -94,7 +94,7 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 		filterMatches()
 	}
 	
-	public func startAutomatching<Game: RealTimeGame>(request: GKMatchRequest, game: Game) async throws {
+	public func startAutomatching<Game: RealTimeMatch>(request: GKMatchRequest, game: Game) async throws {
 		if isAutomatching { return }
 		
 		isAutomatching = true

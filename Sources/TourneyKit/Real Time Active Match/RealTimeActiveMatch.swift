@@ -8,7 +8,7 @@
 import Foundation
 import GameKit
 
-@MainActor @Observable public class RealTimeActiveMatch<Game: RealTimeGame>: NSObject, @preconcurrency GKMatchDelegate, SomeMatch {
+@MainActor @Observable public class RealTimeActiveMatch<Game: RealTimeMatch>: NSObject, @preconcurrency GKMatchDelegate, SomeMatch {
 	public let match: GKMatch
 	@ObservationIgnored public weak var game: Game?
 	@ObservationIgnored let manager: MatchManager

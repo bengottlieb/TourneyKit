@@ -38,7 +38,7 @@ GameCenterInterface (authentication)
 **MatchManager** (`Sources/TourneyKit/Match Manager/`) is the central `@MainActor` coordinator. It listens to GameKit delegate events (via `MatchManager+Conformances.swift`, using `@preconcurrency GKLocalPlayerListener`) and routes them to the appropriate active match object.
 
 **Match types** are generic over a `Game` protocol:
-- `RealTimeGame` — implement to handle real-time data, player connections, and phase changes. Unrecognized incoming messages are forwarded to `didReceive(data:from:)`.
+- `RealTimeMatch` — implement to handle real-time data, player connections, and phase changes. Unrecognized incoming messages are forwarded to `didReceive(data:from:)`.
 - `TurnBasedMatch: Observable, AnyObject` — implement to handle turn state, player drops, and match end. Optional `TurnBasedMatchExchange` sub-protocol adds exchange support.
 
 Both `RealTimeActiveMatch<Game>` and `TurnBasedActiveMatch<Game>` are `@MainActor @Observable`.

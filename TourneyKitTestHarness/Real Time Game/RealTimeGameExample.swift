@@ -9,7 +9,7 @@ import Foundation
 import TourneyKit
 import GameKit
 
-final class RealTimeGameExample: RealTimeGame, ObservableObject {
+final class RealTimeGameExample: RealTimeMatch, ObservableObject {
 	
 	@Published var state: GameState = GameState(currentPlayerID: "")
 	@Published var players: [GKPlayer] = []
