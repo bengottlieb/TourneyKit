@@ -9,11 +9,11 @@ import Foundation
 import GameKit
 import TourneyKit
 
-final class TurnBasedGameExample: TurnBasedGame, ObservableObject {
-	typealias GameState = TurnBasedGameExampleState
+final class TurnBasedGameExample: TurnBasedContainer, ObservableObject {
+	typealias MatchState = TurnBasedGameExampleState
 	
 	var match: TurnBasedActiveMatch<TurnBasedGameExample>?
-	var gameState = TurnBasedGameExampleState()
+	var matchState = TurnBasedGameExampleState()
 	
 	static var defaultRequest: GKMatchRequest {
 		let request = GKMatchRequest()
@@ -28,7 +28,7 @@ final class TurnBasedGameExample: TurnBasedGame, ObservableObject {
 	
 	func clearOut() { }
 
-	func received(gameState: GameState?) {
+	func received(matchState: MatchState?) {
 		objectWillChange.send()
 	}
 	

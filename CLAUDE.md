@@ -38,8 +38,8 @@ GameCenterInterface (authentication)
 **MatchManager** (`Sources/TourneyKit/Match Manager/`) is the central `@MainActor` coordinator. It listens to GameKit delegate events (via `MatchManager+Conformances.swift`, using `@preconcurrency GKLocalPlayerListener`) and routes them to the appropriate active match object.
 
 **Match types** are generic over a `Game` protocol:
-- `RealTimeGame` — implement to handle real-time data, player connections, and phase changes. Unrecognized incoming messages are forwarded to `didReceive(data:from:)`.
-- `TurnBasedGame: Observable, AnyObject` — implement to handle turn state, player drops, and match end.
+- `RealTimeContainer` — implement to handle real-time data, player connections, and phase changes. Unrecognized incoming messages are forwarded to `didReceive(data:from:)`.
+- `TurnBasedContainer: Observable` — implement to handle turn state, player drops, and match end.
 
 Both `RealTimeActiveMatch<Game>` and `TurnBasedActiveMatch<Game>` are `@MainActor @Observable`.
 
@@ -56,7 +56,7 @@ Both `RealTimeActiveMatch<Game>` and `TurnBasedActiveMatch<Game>` are `@MainActo
 - Everything on the match update path is `@MainActor`; ObjC delegate protocols use `@preconcurrency` conformance to bridge GameKit's threading model
 - Both match types are generic (`RealTimeActiveMatch<Game>`, `TurnBasedActiveMatch<Game>`) for type-safe game state
 - Games implement protocols rather than subclassing
-- `SomeMatch` and `SomeTurnBasedActiveMatch` are `@MainActor` protocols enabling polymorphic handling in `MatchManager`
+- `SomeGameKitMatch` and `SomeTurnBasedActiveMatch` are `@MainActor` protocols enabling polymorphic handling in `MatchManager`
 - The entire API is `async/await`; Combine is not used
 
 ## Dependencies

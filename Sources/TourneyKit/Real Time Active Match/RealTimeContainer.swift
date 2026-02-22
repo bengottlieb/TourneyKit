@@ -1,5 +1,5 @@
 //
-//  RealTimeGame.swift
+//  RealTimeContainer.swift
 //  
 //
 //  Created by Ben Gottlieb on 5/20/23.
@@ -8,21 +8,21 @@
 import Foundation
 import GameKit
 
-@MainActor public protocol RealTimeGame: AnyObject {
-	associatedtype GameState: Codable
-	associatedtype GameUpdate: Codable
+@MainActor public protocol RealTimeContainer: AnyObject {
+	associatedtype MatchState: Codable
+	associatedtype MatchUpdate: Codable
 	
 	func didReceive(data: Data, from player: GKPlayer)
 	func loaded(match: RealTimeActiveMatch<Self>, with players: [GKPlayer])
 	func playersChanged(to players: [GKPlayer])
-	func matchStateChanged(to state: GameState)
-	func matchUpdated(with update: GameUpdate)
+	func matchStateChanged(to state: MatchState)
+	func matchUpdated(with update: MatchUpdate)
 
 	func matchPhaseChanged(to phase: ActiveMatchPhase)
 	func matchFailed(withError error: Error)
 }
 
-public extension RealTimeGame {
+public extension RealTimeContainer {
 	func matchFailed(withError error: Error) { }
 }
 

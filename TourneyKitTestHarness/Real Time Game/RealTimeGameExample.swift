@@ -9,14 +9,14 @@ import Foundation
 import TourneyKit
 import GameKit
 
-final class RealTimeGameExample: RealTimeGame, ObservableObject {
+final class RealTimeGameExample: RealTimeContainer, ObservableObject {
 	
-	@Published var state: GameState = GameState(currentPlayerID: "")
+	@Published var state: MatchState = MatchState(currentPlayerID: "")
 	@Published var players: [GKPlayer] = []
 	@Published var isStarted = false
 	var match: RealTimeActiveMatch<RealTimeGameExample>?
 	
-	struct GameState: Codable {
+	struct MatchState: Codable {
 		var currentPlayerID: String
 		var playerCount = 0
 		var moves: [Move] = []
@@ -53,7 +53,7 @@ final class RealTimeGameExample: RealTimeGame, ObservableObject {
 		try? match?.sendState(state)
 	}
 	
-	struct GameUpdate: Codable {
+	struct MatchUpdate: Codable {
 	}
 	
 	func loaded(match: RealTimeActiveMatch<RealTimeGameExample>, with players: [GKPlayer]) {
@@ -93,7 +93,7 @@ final class RealTimeGameExample: RealTimeGame, ObservableObject {
 
 	func didReceive(data: Data, from player: GKPlayer) {
 		do {
-			state = try JSONDecoder().decode(GameState.self, from: data)
+			state = try JSONDecoder().decode(MatchState.self, from: data)
 		} catch {
 			appLogger.error("Failed to decode incoming realtime game data: \(error)")
 		}
@@ -111,11 +111,11 @@ final class RealTimeGameExample: RealTimeGame, ObservableObject {
 		}
 	}
 	
-	func matchStateChanged(to state: GameState) {
+	func matchStateChanged(to state: MatchState) {
 		self.state = state
 	}
 
-	func matchUpdated(with update: GameUpdate) {
+	func matchUpdated(with update: MatchUpdate) {
 		
 	}
 

@@ -23,7 +23,7 @@ extension RealTimeActiveMatch {
 			}
 
 		case .state:
-			if let full = try? JSONDecoder().decode(MessageMatchState<Game.GameState>.self, from: data) {
+			if let full = try? JSONDecoder().decode(MessageMatchState<Game.MatchState>.self, from: data) {
 				TKLogger.instance.log(.matchStateReceived(match, data))
 				game?.matchStateChanged(to: full.payload)
 				recentlyReceivedData.append(full)
@@ -31,7 +31,7 @@ extension RealTimeActiveMatch {
 			}
 
 		case .update:
-			if let full = try? JSONDecoder().decode(MessageMatchState<Game.GameUpdate>.self, from: data) {
+			if let full = try? JSONDecoder().decode(MessageMatchState<Game.MatchUpdate>.self, from: data) {
 				TKLogger.instance.log(.matchUpateReceived(match, data))
 				game?.matchUpdated(with: full.payload)
 				recentlyReceivedData.append(full)
@@ -46,11 +46,11 @@ extension RealTimeActiveMatch {
 		}
 	}
 	
-	public func sendUpdate(_ update: Game.GameUpdate, reliably: Bool = true) throws {
+	public func sendUpdate(_ update: Game.MatchUpdate, reliably: Bool = true) throws {
 		try send(message: MessageMatchUpdate(update), reliably: reliably)
 	}
 	
-	public func sendState(_ state: Game.GameState, reliably: Bool = true) throws {
+	public func sendState(_ state: Game.MatchState, reliably: Bool = true) throws {
 		try send(message: MessageMatchState(state), reliably: reliably)
 	}
 	

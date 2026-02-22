@@ -23,13 +23,13 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 	public var visibleMatches: [GKTurnBasedMatch] = []
 	public var allMatches: [GKTurnBasedMatch] = []
 	public var hideAbortedMatches = true { didSet { filterMatches() }}
-	public var turnBasedGameClass: (any TurnBasedGame.Type)?
+	public var turnBasedGameClass: (any TurnBasedContainer.Type)?
 
 	@ObservationIgnored @AppStorage("last_match_id") public var lastMatchID: String?
 	@ObservationIgnored private var retainedRealTimeGame: AnyObject?
 	@ObservationIgnored private var retainedTurnBasedGame: AnyObject?
 
-	public private(set) var realTimeActiveMatch: SomeMatch?
+	public private(set) var realTimeActiveMatch: SomeGameKitMatch?
 	public private(set) var turnBasedActiveMatch: SomeTurnBasedActiveMatch?
 	public var isInRealTimeMatch: Bool { realTimeActiveMatch != nil }
 	
@@ -44,7 +44,7 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 		isAutomatching = false
 	}
 	
-	public func load<Game: RealTimeGame>(match: GKMatch, game: Game) {
+	public func load<Game: RealTimeContainer>(match: GKMatch, game: Game) {
 		retainedRealTimeGame = game
 		let active = RealTimeActiveMatch(match: match, game: game, matchManager: self)
 		self.realTimeActiveMatch = active
@@ -52,7 +52,7 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 		isAutomatching = false
 	}
 
-	public func load<Game: TurnBasedGame>(match: GKTurnBasedMatch, game: Game) {
+	public func load<Game: TurnBasedContainer>(match: GKTurnBasedMatch, game: Game) {
 		retainedTurnBasedGame = game
 		replace(match)
 		game.clearOut()
@@ -94,7 +94,7 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 		filterMatches()
 	}
 	
-	public func startAutomatching<Game: RealTimeGame>(request: GKMatchRequest, game: Game) async throws {
+	public func startAutomatching<Game: RealTimeContainer>(request: GKMatchRequest, game: Game) async throws {
 		if isAutomatching { return }
 		
 		isAutomatching = true
@@ -109,7 +109,7 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 	}
 	
 	public var canRestoreMatch: Bool { lastMatchID != nil }
-	public func restore<Game: TurnBasedGame>(matchID: String? = nil, game: Game) async throws {
+	public func restore<Game: TurnBasedContainer>(matchID: String? = nil, game: Game) async throws {
 		guard turnBasedActiveMatch == nil else { throw MatchManagerError.alreadyHaveActiveMatch }
 		guard !loadingMatch else { throw MatchManagerError.restoreInProgress }
 		guard let id = matchID ?? lastMatchID else { throw MatchManagerError.missingMatchID }

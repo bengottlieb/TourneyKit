@@ -8,7 +8,7 @@
 import Foundation
 import GameKit
 
-@MainActor public protocol SomeTurnBasedActiveMatch: SomeMatch {
+@MainActor public protocol SomeTurnBasedActiveMatch: SomeGameKitMatch {
 	func receivedTurn(for player: GKPlayer, didBecomeActive: Bool, in match: GKTurnBasedMatch)
 	func matchEnded(for player: GKPlayer, in match: GKTurnBasedMatch)
 	func player(_ player: GKPlayer, receivedExchangeRequest exchange: GKTurnBasedExchange, in match: GKTurnBasedMatch)
@@ -19,7 +19,7 @@ import GameKit
 
 enum TurnBasedError: Error { case noMatchGame, triedToEndGameWhenNotPlaying, noMatchData }
 
-@MainActor @Observable public class TurnBasedActiveMatch<Game: TurnBasedGame>: NSObject, SomeTurnBasedActiveMatch {
+@MainActor @Observable public class TurnBasedActiveMatch<Game: TurnBasedContainer>: NSObject, SomeTurnBasedActiveMatch {
 	public var match: GKTurnBasedMatch
 	@ObservationIgnored public weak var game: Game?
 	@ObservationIgnored let manager: MatchManager
@@ -85,7 +85,7 @@ enum TurnBasedError: Error { case noMatchGame, triedToEndGameWhenNotPlaying, noM
 extension TurnBasedActiveMatch {
 	public var localMatchData: Data {
 		get throws {
-			guard let payload = game?.gameState else { throw TurnBasedError.noMatchGame }
+			guard let payload = game?.matchState else { throw TurnBasedError.noMatchGame }
 			let data = try JSONEncoder().encode(payload)
 			return data
 		}
@@ -98,15 +98,15 @@ extension TurnBasedActiveMatch {
 		}
 	}
 	
-	public var localGameState: Game.GameState {
+	public var localMatchState: Game.MatchState {
 		get throws {
-			try JSONDecoder().decode(Game.GameState.self, from: localMatchData)
+			try JSONDecoder().decode(Game.MatchState.self, from: localMatchData)
 		}
 	}
 
-	public var remoteGameState: Game.GameState {
+	public var remoteMatchState: Game.MatchState {
 		get throws {
-			try JSONDecoder().decode(Game.GameState.self, from: remoteMatchData)
+			try JSONDecoder().decode(Game.MatchState.self, from: remoteMatchData)
 		}
 	}
 
@@ -117,9 +117,9 @@ extension TurnBasedActiveMatch {
 	func reloadMatch(loadingData: Bool) async throws {
 		try await match.loadMatchData()
 		if loadingData, let data = match.matchData {
-			let newState = try JSONDecoder().decode(Game.GameState.self, from: data)
+			let newState = try JSONDecoder().decode(Game.MatchState.self, from: data)
 
-			game?.received(gameState: newState)
+			game?.received(matchState: newState)
 		}
 		MatchManager.instance.replace(match)
 	}
@@ -141,10 +141,10 @@ extension TurnBasedActiveMatch {
 		self.match = match
 		do {
 			if let data = match.matchData {
-				let payload = try JSONDecoder().decode(Game.GameState.self, from: data)
-				game?.received(gameState: payload)
+				let payload = try JSONDecoder().decode(Game.MatchState.self, from: data)
+				game?.received(matchState: payload)
 			} else {
-				game?.received(gameState: nil)
+				game?.received(matchState: nil)
 			}
 		} catch {
 			tourneyLogger.error("Failed to decode Game State: \(error)")
