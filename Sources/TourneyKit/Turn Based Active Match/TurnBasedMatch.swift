@@ -1,5 +1,5 @@
 //
-//  TurnBasedGame.swift
+//  TurnBasedMatch.swift
 //  
 //
 //  Created by Ben Gottlieb on 5/22/23.
@@ -9,7 +9,7 @@ import SwiftUI
 import GameKit
 import Observation
 
-public protocol TurnBasedGame: Observable, AnyObject {
+public protocol TurnBasedMatch: Observable, AnyObject {
 	associatedtype GameState: Codable
 	
 	var gameState: GameState { get set }
@@ -22,7 +22,7 @@ public protocol TurnBasedGame: Observable, AnyObject {
 	static var defaultRequest: GKMatchRequest { get }
 }
 
-public protocol TurnBasedGameExchange: TurnBasedGame {
+public protocol TurnBasedMatchExchange: TurnBasedMatch {
 	func receivedExchangeRequest(_ request: GKTurnBasedExchange)
 	func cancelledExchangeRequest(_ exchange: GKTurnBasedExchange)
 	func repliedToExchangeRequest(_ exchange: GKTurnBasedExchange, with replies: [GKTurnBasedExchangeReply])

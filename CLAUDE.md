@@ -39,17 +39,19 @@ GameCenterInterface (authentication)
 
 **Match types** are generic over a `Game` protocol:
 - `RealTimeGame` — implement to handle real-time data, player connections, and phase changes. Unrecognized incoming messages are forwarded to `didReceive(data:from:)`.
-- `TurnBasedGame: Observable, AnyObject` — implement to handle turn state, player drops, and match end.
+- `TurnBasedMatch: Observable, AnyObject` — implement to handle turn state, player drops, and match end. Optional `TurnBasedMatchExchange` sub-protocol adds exchange support.
 
 Both `RealTimeActiveMatch<Game>` and `TurnBasedActiveMatch<Game>` are `@MainActor @Observable`.
 
-**Messaging** (`MatchMessage.swift`) uses a `Codable`-based protocol with a `kind` discriminator field. Built-in types: `.phaseChange`, `.playerInfo`, `.state`, `.update`. Data not recognisable as a framework message is forwarded to `game.didReceive(data:from:)`. `recentlyReceivedData` on `RealTimeActiveMatch` accumulates the last `recentDataDepth` (default 20) state/update messages.
+**Messaging** (`MatchMessage.swift`) uses a `Codable`-based protocol with a `kind` discriminator field. Built-in types: `.phaseChange`, `.playerInfo`, `.state`, `.update`. Data not recognisable as a framework message is forwarded to `game.didReceive(data:from:)`. `recentlyReceivedData` on `RealTimeActiveMatch` accumulates the last `recentDataDepth` (default 5) state/update messages.
 
 **Player identification** uses `GKPlayer.PlayerTag` (`Extensions/GKPlayer.swift`), which holds `teamID`, `gameID`, and `alias`. `PlayerCache` (name/ID) and `PlayerImageCache` (avatar, via JohnnyCache) manage per-session player metadata.
 
 **UI components** include SwiftUI wrappers for GameKit's matchmaker view controllers (`RealTimeMatchmakerView`, `TurnBasedMatchmakerView`, UIKit-only) and player display views (`PlayerAvatar`, `PlayerLabel`, `PlayerInfoView`). Both matchmaker coordinators are `@MainActor` with `@preconcurrency` ObjC delegate conformances.
 
 **Logging** uses OSLog via `TKLogger` (`@MainActor @Observable` singleton, subsystem `"TourneyKit"`, category `"matches"`). `LoggerView` is a SwiftUI debug view surfacing recent events.
+
+**Utilities** include `PlayerDictionary<Content>` (`PlayerDictionary.swift`), a generic key-value store subscriptable by `GKPlayer.PlayerTag` or `GKPlayer`. Extensions on `GKTurnBasedMatch` (`Extensions/GKTurnBasedMatch.swift`) add computed properties like `isActive`, `wasAborted`, `isLocalPlayersTurn`, `opponents`, `activeParticipants`, and `[GKTurnBasedMatch].sortedByRecency()`.
 
 ## Key Design Patterns
 
@@ -61,8 +63,8 @@ Both `RealTimeActiveMatch<Game>` and `TurnBasedActiveMatch<Game>` are `@MainActo
 
 ## Dependencies
 
-- **CrossPlatformKit** (`https://github.com/ios-tooling/CrossPlatformKit.git`, ≥1.1.0) — platform-agnostic type aliases (`UXImage`, etc.)
-- **JohnnyCache** (local path `../JohnnyCache`) — three-tier cache (memory/disk/CloudKit) used for player avatar images
+- **CrossPlatformKit** (`https://github.com/ios-tooling/CrossPlatformKit.git`, ≥1.0.12) — platform-agnostic type aliases (`UXImage`, etc.)
+- **JohnnyCache** (`https://github.com/ios-tooling/JohnnyCache.git`, ≥1.0.9) — three-tier cache (memory/disk/CloudKit) used for player avatar images
 
 ## Platforms
 

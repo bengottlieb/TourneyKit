@@ -19,7 +19,7 @@ import GameKit
 
 enum TurnBasedError: Error { case noMatchGame, triedToEndGameWhenNotPlaying, noMatchData }
 
-@MainActor @Observable public class TurnBasedActiveMatch<Game: TurnBasedGame>: NSObject, SomeTurnBasedActiveMatch {
+@MainActor @Observable public class TurnBasedActiveMatch<Game: TurnBasedMatch>: NSObject, SomeTurnBasedActiveMatch {
 	public var match: GKTurnBasedMatch
 	@ObservationIgnored public weak var game: Game?
 	@ObservationIgnored let manager: MatchManager
@@ -158,17 +158,17 @@ extension TurnBasedActiveMatch {
 
 	public func player(_ player: GKPlayer, receivedExchangeRequest exchange: GKTurnBasedExchange, in match: GKTurnBasedMatch) {
 		self.match = match
-		(game as? (any TurnBasedGameExchange))?.receivedExchangeRequest(exchange)
+		(game as? (any TurnBasedMatchExchange))?.receivedExchangeRequest(exchange)
 	}
 	
 	public func player(_ player: GKPlayer, receivedExchangeCancellation exchange: GKTurnBasedExchange, in match: GKTurnBasedMatch) {
 		self.match = match
-		(game as? (any TurnBasedGameExchange))?.cancelledExchangeRequest(exchange)
+		(game as? (any TurnBasedMatchExchange))?.cancelledExchangeRequest(exchange)
 	}
 	
 	public func player(_ player: GKPlayer, receivedExchangeReplies replies: [GKTurnBasedExchangeReply], forCompletedExchange exchange: GKTurnBasedExchange, in match: GKTurnBasedMatch) {
 		self.match = match
-		(game as? (any TurnBasedGameExchange))?.repliedToExchangeRequest(exchange, with: replies)
+		(game as? (any TurnBasedMatchExchange))?.repliedToExchangeRequest(exchange, with: replies)
 	}
 	
 	public func quitRequest(from player: GKPlayer, in match: GKTurnBasedMatch) {
