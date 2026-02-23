@@ -8,6 +8,7 @@
 #if canImport(UIKit)
 import UIKit
 import GameKit
+import Achtung
 
 @MainActor @Observable public class GameCenterInterface {
 	public static let instance = GameCenterInterface()
@@ -38,6 +39,9 @@ import GameKit
 							self.isAuthenticated = false
 							tourneyLogger.error("GameKit Authentication Error: \(error.localizedDescription).")
 							if !resumed { resumed = true; continuation.resume(returning: false) }
+							if RemoteMatchManager.instance.showErrors {
+								Achtung.show(error, level: .standard, title: "Unable to Connect to Game Center")
+							}
 							return
 						}
 						PlayerCache.instance.set(name: GKLocalPlayer.local.displayName, id: GKLocalPlayer.local.teamPlayerID, for: GKLocalPlayer.local)

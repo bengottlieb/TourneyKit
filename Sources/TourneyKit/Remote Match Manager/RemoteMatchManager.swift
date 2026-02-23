@@ -8,6 +8,7 @@
 import SwiftUI
 import GameKit
 import OSLog
+import Achtung
 
 let tourneyLogger = Logger(subsystem: "TourneyKit", category: "matches")
 
@@ -24,6 +25,8 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 	public var allMatches: [GKTurnBasedMatch] = []
 	public var hideAbortedMatches = true { didSet { filterMatches() }}
 	public var turnBasedGameClass: (any TurnBasedContainer.Type)?
+	public var loadingError: Error?
+	public var showErrors = true
 
 	@ObservationIgnored @AppStorage("last_match_id") public var lastMatchID: String?
 	@ObservationIgnored private var retainedRealTimeGame: AnyObject?
@@ -32,6 +35,7 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 	public private(set) var realTimeActiveMatch: SomeGameKitMatch?
 	public private(set) var turnBasedActiveMatch: SomeTurnBasedActiveMatch?
 	public var isInRealTimeMatch: Bool { realTimeActiveMatch != nil }
+	public var canStartNewRealTimeMatch: Bool { GameCenterInterface.instance.isAuthenticated && RemoteMatchManager.instance.loadingError == nil }
 	
 	override private init() {
 		super.init()
@@ -76,8 +80,13 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 			allMatches = try await GKTurnBasedMatch.loadMatches()
 			filterMatches()
 			tourneyLogger.notice("Fetched \(self.allMatches.count), \(self.visibleMatches.count) visible, \(self.activeMatches.count) active")
+			loadingError = nil
 		} catch {
-			print("Failed to reload active games: \(error)")
+			if showErrors, (loadingError as? NSError) != (error as NSError) {
+				await Achtung.show(error)
+			}
+			loadingError = error
+			print("Failed to reload active games: \(error.localizedDescription)")
 		}
 	}
 	
