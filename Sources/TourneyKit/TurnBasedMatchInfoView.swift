@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  TurnBasedMatchInfoView.swift
 //  
 //
 //  Created by Ben Gottlieb on 5/30/23.

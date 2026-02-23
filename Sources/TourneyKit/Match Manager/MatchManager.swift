@@ -37,6 +37,14 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 		super.init()
 	}
 	
+	public func setup() {
+		Task {
+			if await GameCenterInterface.instance.authenticate() {
+				await self.reloadActiveGames()
+			}
+		}
+	}
+	
 	public func cancelAutomatching() {
 		if !isAutomatching { return }
 		
@@ -63,10 +71,14 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 		isAutomatching = false
 	}
 	
-	public func reloadActiveGames() async throws {
-		allMatches = try await GKTurnBasedMatch.loadMatches()
-		filterMatches()
-		tourneyLogger.notice("Fetched \(self.allMatches.count), \(self.visibleMatches.count) visible, \(self.activeMatches.count) active")
+	public func reloadActiveGames() async {
+		do {
+			allMatches = try await GKTurnBasedMatch.loadMatches()
+			filterMatches()
+			tourneyLogger.notice("Fetched \(self.allMatches.count), \(self.visibleMatches.count) visible, \(self.activeMatches.count) active")
+		} catch {
+			print("Failed to reload active games: \(error)")
+		}
 	}
 	
 	func filterMatches() {
