@@ -46,7 +46,8 @@ import GameKit
 						GKAccessPoint.shared.showHighlights = true
 						GKAccessPoint.shared.isActive = true
 						self.isAuthenticated = true
-						Task { try? await matchManager.reloadActiveGames() }
+						print("Signed in to GameCenter as \(GKLocalPlayer.local.displayName)")
+						Task { await matchManager.reloadActiveGames() }
 						if !resumed { resumed = true; continuation.resume(returning: true) }
 					}
 				}
