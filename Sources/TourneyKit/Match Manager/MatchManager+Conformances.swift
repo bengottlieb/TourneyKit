@@ -1,6 +1,6 @@
 //
-//  MatchManager+Conformance.swift
-//  
+//  RemoteMatchManager+Conformance.swift
+//
 //
 //  Created by Ben Gottlieb on 5/21/23.
 //
@@ -8,26 +8,26 @@
 import Foundation
 import GameKit
 
-extension MatchManager: @preconcurrency GKLocalPlayerListener { }
+extension RemoteMatchManager: @preconcurrency GKLocalPlayerListener { }
 
-extension MatchManager /* GKInviteEventListener */ {
+extension RemoteMatchManager /* GKInviteEventListener */ {
 	public func player(_ player: GKPlayer, didAccept invite: GKInvite) {
 		TKLogger.instance.log(.playerAccept(player, invite))
 	}
 	public func player(_ player: GKPlayer, didRequestMatchWithRecipients recipientPlayers: [GKPlayer])  { TKLogger.instance.log(.playerRequestMatch(recipientPlayers)) }
 }
 
-extension MatchManager /* GKSavedGameListener */ {
+extension RemoteMatchManager /* GKSavedGameListener */ {
 	public func player(_ player: GKPlayer, didModifySavedGame savedGame: GKSavedGame) { TKLogger.instance.log(.playerDidModifySavedGame(savedGame)) }
 	public func player(_ player: GKPlayer, hasConflictingSavedGames savedGames: [GKSavedGame]) { TKLogger.instance.log(.playerHasConflictingSavedGames(player, savedGames)) }
 }
 
-extension MatchManager /* GKTurnBasedEventListener */ {
+extension RemoteMatchManager /* GKTurnBasedEventListener */ {
 	
 	public func player(_ player: GKPlayer, didRequestMatchWithOtherPlayers playersToInvite: [GKPlayer]) {
 		TKLogger.instance.log(.didRequestMatch(playersToInvite))
 		guard let gameType = turnBasedGameClass else {
-			tourneyLogger.error("Received a Match Request from GameCenter, but no turnBasedGameClass is set in the MatchManager. Please set this if you want to support these messages.")
+			tourneyLogger.error("Received a Match Request from GameCenter, but no turnBasedGameClass is set in the RemoteMatchManager. Please set this if you want to support these messages.")
 			return
 		}
 		
@@ -76,7 +76,7 @@ extension MatchManager /* GKTurnBasedEventListener */ {
 	
 }
 
-extension MatchManager /* GKChallengeListener */ {
+extension RemoteMatchManager /* GKChallengeListener */ {
 	public func player(_ player: GKPlayer, wantsToPlay challenge: GKChallenge) { TKLogger.instance.log(.playerWantsToPlay(player, challenge)) }
 	public func player(_ player: GKPlayer, didReceive challenge: GKChallenge) { TKLogger.instance.log(.playerDidReceiveChallenge(player, challenge)) }
 	public func player(_ player: GKPlayer, didComplete challenge: GKChallenge, issuedByFriend friendPlayer: GKPlayer) { TKLogger.instance.log(.playerDidCompleteChallenge(player, challenge)) }

@@ -10,7 +10,7 @@ import TourneyKit
 
 struct TurnBasedGameView: View {
 	@ObservedObject var game: TurnBasedGameExample
-	@Environment(MatchManager.self) var mgr
+	@Environment(RemoteMatchManager.self) var mgr
 	@State var isReloading = false
 	
 	func reloadMatch() {

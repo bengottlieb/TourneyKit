@@ -1,5 +1,5 @@
 //
-//  MatchManager.swift
+//  RemoteMatchManager.swift
 //  
 //
 //  Created by Ben Gottlieb on 5/19/23.
@@ -13,8 +13,8 @@ let tourneyLogger = Logger(subsystem: "TourneyKit", category: "matches")
 
 enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyHaveActiveMatch }
 
-@MainActor @Observable public class MatchManager: NSObject {
-	public static let instance = MatchManager()
+@MainActor @Observable public class RemoteMatchManager: NSObject {
+	public static let instance = RemoteMatchManager()
 
 	public var isAutomatching = false
 	public var loadingMatch = false

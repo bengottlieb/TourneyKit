@@ -20,7 +20,7 @@ struct TourneyKitTestHarnessApp: App {
 	var body: some Scene {
 		WindowGroup {
 			ContentView()
-				.environment(MatchManager.instance)
+				.environment(RemoteMatchManager.instance)
 		}
 	}
 }

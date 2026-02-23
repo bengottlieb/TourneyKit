@@ -22,7 +22,7 @@ enum TurnBasedError: Error { case noMatchGame, triedToEndGameWhenNotPlaying, noM
 @MainActor @Observable public class TurnBasedActiveMatch<Game: TurnBasedContainer>: NSObject, SomeTurnBasedActiveMatch {
 	public var match: GKTurnBasedMatch
 	@ObservationIgnored public weak var game: Game?
-	@ObservationIgnored let manager: MatchManager
+	@ObservationIgnored let manager: RemoteMatchManager
 	public var parentGame: AnyObject? { game }
 	public var currentPlayer: GKPlayer? { match.currentParticipant?.player }
 	public var status: GKTurnBasedMatch.Status { isLocalPlayerPlaying ? match.status : .ended }
@@ -39,7 +39,7 @@ enum TurnBasedError: Error { case noMatchGame, triedToEndGameWhenNotPlaying, noM
 		return participants.compactMap { $0.player }
 	}
 	
-	public init(match: GKTurnBasedMatch, game: Game?, matchManager: MatchManager) {
+	public init(match: GKTurnBasedMatch, game: Game?, matchManager: RemoteMatchManager) {
 		self.match = match
 		self.game = game
 		self.manager = matchManager
@@ -54,7 +54,7 @@ enum TurnBasedError: Error { case noMatchGame, triedToEndGameWhenNotPlaying, noM
 		let participants = nextParticipants(startingWith: nextPlayers)
 		tourneyLogger.info("Ending turn, next: \(participants.map { $0.player?.displayName ?? "Unnamed Player" }.joined(separator: ", "))")
 		try await match.endTurn(withNextParticipants: participants, turnTimeout: timeOut, match: try localMatchData)
-		MatchManager.instance.replace(match)
+		RemoteMatchManager.instance.replace(match)
 	}
 	
 	public func endGame(withOutcome outcome: GKTurnBasedMatch.Outcome, nextPlayers: [GKPlayer]? = nil, timeOut: TimeInterval = 60.0) async throws {
@@ -121,7 +121,7 @@ extension TurnBasedActiveMatch {
 
 			game?.received(matchState: newState)
 		}
-		MatchManager.instance.replace(match)
+		RemoteMatchManager.instance.replace(match)
 	}
 
 	func nextParticipants(startingWith next: [GKPlayer]?) -> [GKTurnBasedParticipant] {
@@ -178,7 +178,7 @@ extension TurnBasedActiveMatch {
 	
 	public func removeMatch() async throws {
 		try await match.remove()
-		MatchManager.instance.removeMatch(match)
+		RemoteMatchManager.instance.removeMatch(match)
 	}
 
 }

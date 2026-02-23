@@ -81,7 +81,7 @@ TurnBasedMatchmakerView(request: matchRequest, game: myGame)
 Or start automatching directly:
 
 ```swift
-try await MatchManager.instance.startAutomatching(request: request, game: myGame)
+try await RemoteMatchManager.instance.startAutomatching(request: request, game: myGame)
 ```
 
 ### 4. Play the Match
@@ -104,12 +104,12 @@ try await match.endGame(withOutcome: .won)
 
 ```
 GameCenterInterface          — Game Center authentication
-    └── MatchManager         — central @MainActor coordinator (singleton)
+    └── RemoteMatchManager         — central @MainActor coordinator (singleton)
             ├── RealTimeActiveMatch<Game>    — wraps GKMatch
             └── TurnBasedActiveMatch<Game>   — wraps GKTurnBasedMatch
 ```
 
-**MatchManager** is the hub. It listens to all GameKit delegate events and routes them to the appropriate active match object. Your game interacts with match objects; the manager handles the plumbing.
+**RemoteMatchManager** is the hub. It listens to all GameKit delegate events and routes them to the appropriate active match object. Your game interacts with match objects; the manager handles the plumbing.
 
 Both match types are generic over your game protocol, giving you type-safe access to your `MatchState` and `MatchUpdate` types throughout.
 
@@ -118,7 +118,7 @@ Both match types are generic over your game protocol, giving you type-safe acces
 | Type | Role |
 |------|------|
 | `GameCenterInterface` | Singleton handling Game Center auth |
-| `MatchManager` | Singleton coordinating all match activity |
+| `RemoteMatchManager` | Singleton coordinating all match activity |
 | `RealTimeContainer` | Protocol your real-time game implements |
 | `TurnBasedContainer` | Protocol your turn-based game implements |
 | `RealTimeActiveMatch<Game>` | Manages a live real-time match |

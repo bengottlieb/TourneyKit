@@ -28,14 +28,14 @@ TourneyKit wraps GameKit using a facade pattern with two match tracks:
 **Core flow:**
 ```
 GameCenterInterface (authentication)
-    └── MatchManager (@MainActor singleton)
+    └── RemoteMatchManager (@MainActor singleton)
             ├── RealTimeActiveMatch<Game>   (wraps GKMatch)
             └── TurnBasedActiveMatch<Game>  (wraps GKTurnBasedMatch)
 ```
 
 **GameCenterInterface** (`Sources/TourneyKit/GameCenterInterface.swift`) handles Game Center authentication. Call `authenticate() async -> Bool` once at startup (UIKit-only; no macOS native support). Concurrent callers share a single `Task` — authentication only runs once. The underlying `GKLocalPlayer.authenticateHandler` is called multiple times by GameKit (once with a login view controller if needed, once with the result); `withCheckedContinuation` is resumed exactly once on the final outcome.
 
-**MatchManager** (`Sources/TourneyKit/Match Manager/`) is the central `@MainActor` coordinator. It listens to GameKit delegate events (via `MatchManager+Conformances.swift`, using `@preconcurrency GKLocalPlayerListener`) and routes them to the appropriate active match object.
+**RemoteMatchManager** (`Sources/TourneyKit/Match Manager/`) is the central `@MainActor` coordinator. It listens to GameKit delegate events (via `RemoteMatchManager+Conformances.swift`, using `@preconcurrency GKLocalPlayerListener`) and routes them to the appropriate active match object.
 
 **Match types** are generic over a `Game` protocol:
 - `RealTimeContainer` — implement to handle real-time data, player connections, and phase changes. Unrecognized incoming messages are forwarded to `didReceive(data:from:)`.
@@ -56,7 +56,7 @@ Both `RealTimeActiveMatch<Game>` and `TurnBasedActiveMatch<Game>` are `@MainActo
 - Everything on the match update path is `@MainActor`; ObjC delegate protocols use `@preconcurrency` conformance to bridge GameKit's threading model
 - Both match types are generic (`RealTimeActiveMatch<Game>`, `TurnBasedActiveMatch<Game>`) for type-safe game state
 - Games implement protocols rather than subclassing
-- `SomeGameKitMatch` and `SomeTurnBasedActiveMatch` are `@MainActor` protocols enabling polymorphic handling in `MatchManager`
+- `SomeGameKitMatch` and `SomeTurnBasedActiveMatch` are `@MainActor` protocols enabling polymorphic handling in `RemoteMatchManager`
 - The entire API is `async/await`; Combine is not used
 
 ## Dependencies

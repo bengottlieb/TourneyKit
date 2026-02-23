@@ -11,7 +11,7 @@ import GameKit
 struct ContentView: View {
 	@State var game = RealTimeGameExample()
 	@State var turnBasedGame: TurnBasedGameExample?
-	@Environment(MatchManager.self) var mgr
+	@Environment(RemoteMatchManager.self) var mgr
 	@State var matchView: RealTimeMatchmakerView?
 	@State var match: GKMatch?
 	@State var showingTurnBasedUI = false

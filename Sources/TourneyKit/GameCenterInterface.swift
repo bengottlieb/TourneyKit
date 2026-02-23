@@ -24,7 +24,7 @@ import GameKit
 		if isAuthenticated { return true }
 		if let authTask { return await authTask.value }
 
-		let matchManager = MatchManager.instance
+		let matchManager = RemoteMatchManager.instance
 		let newTask = Task { () -> Bool in
 			await withCheckedContinuation { continuation in
 				var resumed = false

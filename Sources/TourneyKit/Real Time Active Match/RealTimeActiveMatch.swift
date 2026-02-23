@@ -11,7 +11,7 @@ import GameKit
 @MainActor @Observable public class RealTimeActiveMatch<Game: RealTimeContainer>: NSObject, @preconcurrency GKMatchDelegate, SomeGameKitMatch {
 	public let match: GKMatch
 	@ObservationIgnored public weak var game: Game?
-	@ObservationIgnored let manager: MatchManager
+	@ObservationIgnored let manager: RemoteMatchManager
 	public private(set) var phase: ActiveMatchPhase = .loading
 	public var recentlyReceivedData: [any MatchMessage] = []
 	@ObservationIgnored public var recentDataDepth = 5
@@ -19,7 +19,7 @@ import GameKit
 	public var allPlayers: [GKPlayer] { [GKLocalPlayer.local] + match.players }
 	public var parentGame: AnyObject? { game }
 
-	init(match: GKMatch, game: Game?, matchManager: MatchManager) {
+	init(match: GKMatch, game: Game?, matchManager: RemoteMatchManager) {
 		self.match = match
 		self.manager = matchManager
 		super.init()
