@@ -27,6 +27,7 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 	public var turnBasedGameClass: (any TurnBasedContainer.Type)?
 	public var loadingError: Error?
 	public var showErrors = true
+	public var hasLoaded = false
 
 	@ObservationIgnored @AppStorage("last_match_id") public var lastMatchID: String?
 	@ObservationIgnored private var retainedRealTimeGame: AnyObject?
@@ -81,6 +82,7 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 			filterMatches()
 			tourneyLogger.notice("Fetched \(self.allMatches.count), \(self.visibleMatches.count) visible, \(self.activeMatches.count) active")
 			loadingError = nil
+			hasLoaded = true
 		} catch {
 			if showErrors, (loadingError as? NSError) != (error as NSError) {
 				await Achtung.show(error)
