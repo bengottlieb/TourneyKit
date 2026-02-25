@@ -21,7 +21,7 @@ import Achtung
 		set { GKAccessPoint.shared.isActive = newValue }
 	}
 	
-	public var localPlayerID: String { GKLocalPlayer.local.tourneyKitID }
+	public nonisolated static var localPlayerID: String { GKLocalPlayer.local.tourneyKitID }
 
 	@discardableResult public func authenticate() async -> Bool {
 		if isAuthenticated { return true }
