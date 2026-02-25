@@ -36,7 +36,7 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 	public private(set) var realTimeActiveMatch: SomeGameKitMatch?
 	public private(set) var turnBasedActiveMatch: SomeTurnBasedActiveMatch?
 	public var isInRealTimeMatch: Bool { realTimeActiveMatch != nil }
-	public var canStartNewRealTimeMatch: Bool { GameCenterInterface.instance.isAuthenticated && RemoteMatchManager.instance.loadingError == nil }
+	public var canStartNewRealTimeMatch: Bool { GameCenterInterface.instance.isAuthenticated && loadingError == nil }
 	
 	override private init() {
 		super.init()
@@ -106,6 +106,10 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 	@MainActor public func clearTurnBasedMatch() {
 		turnBasedActiveMatch = nil
 		retainedTurnBasedGame = nil
+	}
+	
+	public func turnBasedMatch(withID: String) -> GKTurnBasedMatch? {
+		allMatches.first(where: { $0.matchID == withID })
 	}
 	
 	func replace(_ match: GKTurnBasedMatch) {
