@@ -12,5 +12,5 @@ import GameKit
 	var turnBasedMatch: GKTurnBasedMatch? { get }
 	var realTimeMatch: GKMatch? { get }
 	
-	var parentGame: AnyObject? { get }
+	var parentContainer: AnyObject? { get }
 }

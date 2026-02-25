@@ -11,7 +11,7 @@ import GameKit
 extension RealTimeActiveMatch {
 	func handleIncoming(data: Data, from player: GKPlayer) {
 		guard let raw = try? JSONDecoder().decode(RawMessage.self, from: data) else {
-			game?.didReceive(data: data, from: player)
+			container?.didReceive(data: data, from: player)
 			return
 		}
 
@@ -23,17 +23,17 @@ extension RealTimeActiveMatch {
 			}
 
 		case .state:
-			if let full = try? JSONDecoder().decode(MessageMatchState<Game.MatchState>.self, from: data) {
+			if let full = try? JSONDecoder().decode(MessageMatchState<Container.MatchState>.self, from: data) {
 				TKLogger.instance.log(.matchStateReceived(match, data))
-				game?.matchStateChanged(to: full.payload)
+				container?.matchStateChanged(to: full.payload)
 				recentlyReceivedData.append(full)
 				if recentlyReceivedData.count > recentDataDepth { recentlyReceivedData.removeFirst() }
 			}
 
 		case .update:
-			if let full = try? JSONDecoder().decode(MessageMatchState<Game.MatchUpdate>.self, from: data) {
+			if let full = try? JSONDecoder().decode(MessageMatchState<Container.MatchUpdate>.self, from: data) {
 				TKLogger.instance.log(.matchUpateReceived(match, data))
-				game?.matchUpdated(with: full.payload)
+				container?.matchUpdated(with: full.payload)
 				recentlyReceivedData.append(full)
 				if recentlyReceivedData.count > recentDataDepth { recentlyReceivedData.removeFirst() }
 			}
@@ -46,11 +46,11 @@ extension RealTimeActiveMatch {
 		}
 	}
 	
-	public func sendUpdate(_ update: Game.MatchUpdate, reliably: Bool = true) throws {
+	public func sendUpdate(_ update: Container.MatchUpdate, reliably: Bool = true) throws {
 		try send(message: MessageMatchUpdate(update), reliably: reliably)
 	}
 	
-	public func sendState(_ state: Game.MatchState, reliably: Bool = true) throws {
+	public func sendState(_ state: Container.MatchState, reliably: Bool = true) throws {
 		try send(message: MessageMatchState(state), reliably: reliably)
 	}
 	

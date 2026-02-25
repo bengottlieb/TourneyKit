@@ -22,10 +22,10 @@ public struct TurnBasedMatchmakerView: UIViewControllerRepresentable, Identifiab
 		}
 	}
 
-	public init<Game: TurnBasedContainer>(request: GKMatchRequest, game: Game) {
+	public init<Container: TurnBasedContainer>(request: GKMatchRequest, container: Container) {
 		_controller = State(initialValue: GKTurnBasedMatchmakerViewController(matchRequest: request))
 		completion = { newMatch in
-			RemoteMatchManager.instance.load(match: newMatch, game: game)
+			RemoteMatchManager.instance.load(match: newMatch, container: container)
 		}
 	}
 

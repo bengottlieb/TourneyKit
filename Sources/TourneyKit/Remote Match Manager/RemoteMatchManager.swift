@@ -24,14 +24,14 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 	public var visibleMatches: [GKTurnBasedMatch] = []
 	public var allMatches: [GKTurnBasedMatch] = []
 	public var hideAbortedMatches = true { didSet { filterMatches() }}
-	public var turnBasedGameClass: (any TurnBasedContainer.Type)?
+	public var turnBasedContainerClass: (any TurnBasedContainer.Type)?
 	public var loadingError: Error?
 	public var showErrors = true
 	public var hasLoaded = false
 
 	@ObservationIgnored @AppStorage("last_match_id") public var lastMatchID: String?
-	@ObservationIgnored private var retainedRealTimeGame: AnyObject?
-	@ObservationIgnored private var retainedTurnBasedGame: AnyObject?
+	@ObservationIgnored private var retainedRealTimeContainer: AnyObject?
+	@ObservationIgnored private var retainedTurnBasedContainer: AnyObject?
 
 	public private(set) var realTimeActiveMatch: SomeGameKitMatch?
 	public private(set) var turnBasedActiveMatch: SomeTurnBasedActiveMatch?
@@ -45,7 +45,7 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 	public func setup() {
 		Task {
 			if await GameCenterInterface.instance.authenticate() {
-				await self.reloadActiveGames()
+				await self.reloadActiveMatches()
 			}
 		}
 	}
@@ -57,26 +57,26 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 		isAutomatching = false
 	}
 	
-	public func load<Game: RealTimeContainer>(match: GKMatch, game: Game) {
-		retainedRealTimeGame = game
-		let active = RealTimeActiveMatch(match: match, game: game, matchManager: self)
+	public func load<Container: RealTimeContainer>(match: GKMatch, container: Container) {
+		retainedRealTimeContainer = container
+		let active = RealTimeActiveMatch(match: match, container: container, matchManager: self)
 		self.realTimeActiveMatch = active
-		game.loaded(match: active, with: active.allPlayers)
+		container.loaded(match: active, with: active.allPlayers)
 		isAutomatching = false
 	}
 
-	public func load<Game: TurnBasedContainer>(match: GKTurnBasedMatch, game: Game) {
-		retainedTurnBasedGame = game
+	public func load<Container: TurnBasedContainer>(match: GKTurnBasedMatch, container: Container) {
+		retainedTurnBasedContainer = container
 		replace(match)
-		game.clearOut()
-		let active = TurnBasedActiveMatch(match: match, game: game, matchManager: self)
+		container.clearOut()
+		let active = TurnBasedActiveMatch(match: match, container: container, matchManager: self)
 		self.turnBasedActiveMatch = active
-		game.loaded(match: active)
+		container.loaded(match: active)
 		lastMatchID  = match.matchID
 		isAutomatching = false
 	}
 	
-	public func reloadActiveGames() async {
+	public func reloadActiveMatches() async {
 		do {
 			allMatches = try await GKTurnBasedMatch.loadMatches()
 			filterMatches()
@@ -88,7 +88,7 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 				await Achtung.show(error)
 			}
 			loadingError = error
-			print("Failed to reload active games: \(error.localizedDescription)")
+			print("Failed to reload active matches: \(error.localizedDescription)")
 		}
 	}
 	
@@ -100,12 +100,12 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 	
 	@MainActor public func clearRealTimeMatch() {
 		realTimeActiveMatch = nil
-		retainedRealTimeGame = nil
+		retainedRealTimeContainer = nil
 	}
 
 	@MainActor public func clearTurnBasedMatch() {
 		turnBasedActiveMatch = nil
-		retainedTurnBasedGame = nil
+		retainedTurnBasedContainer = nil
 	}
 	
 	public func turnBasedMatch(withID: String) -> GKTurnBasedMatch? {
@@ -121,13 +121,13 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 		filterMatches()
 	}
 	
-	public func startAutomatching<Game: RealTimeContainer>(request: GKMatchRequest, game: Game) async throws {
+	public func startAutomatching<Container: RealTimeContainer>(request: GKMatchRequest, container: Container) async throws {
 		if isAutomatching { return }
 		
 		isAutomatching = true
 		do {
 			let match = try await GKMatchmaker.shared().findMatch(for: request)
-			load(match: match, game: game)
+			load(match: match, container: container)
 		} catch {
 			isAutomatching = false
 			tourneyLogger.error("Failed to find match: \(error)")
@@ -136,14 +136,14 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 	}
 	
 	public var canRestoreMatch: Bool { lastMatchID != nil }
-	public func restore<Game: TurnBasedContainer>(matchID: String? = nil, game: Game) async throws {
+	public func restore<Container: TurnBasedContainer>(matchID: String? = nil, container: Container) async throws {
 		guard turnBasedActiveMatch == nil else { throw MatchManagerError.alreadyHaveActiveMatch }
 		guard !loadingMatch else { throw MatchManagerError.restoreInProgress }
 		guard let id = matchID ?? lastMatchID else { throw MatchManagerError.missingMatchID }
 		loadingMatch = true
 		defer { loadingMatch = false }
 		let match = try await GKTurnBasedMatch.load(withID: id)
-		load(match: match, game: game)
+		load(match: match, container: container)
 	}
 	
 	func removeMatch(_ match: GKTurnBasedMatch) {

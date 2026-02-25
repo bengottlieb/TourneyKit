@@ -8,7 +8,7 @@
 import GameKit
 
 public extension GKPlayer {
-	var playerTag: PlayerTag { PlayerTag(teamID: teamPlayerID, gameID: gamePlayerID, alias: alias) }
+	var playerTag: PlayerTag { PlayerTag(teamID: teamPlayerID, containerID: gamePlayerID, alias: alias) }
 
 	var isLocalPlayer: Bool {
 		self == GKLocalPlayer.local
@@ -22,10 +22,10 @@ public extension GKPlayer {
 extension GKPlayer {
 	public struct PlayerTag: Codable, CustomStringConvertible, Equatable {
 		public let teamID: String
-		public let gameID: String
+		public let containerID: String
 		public let alias: String
 		
-		public var hasTemporaryIDs: Bool { teamID.contains(":") || gameID.contains(":") }
+		public var hasTemporaryIDs: Bool { teamID.contains(":") || containerID.contains(":") }
 		public var description: String {
 			if hasTemporaryIDs { return "[\(alias)]" }
 			return "\(alias) [\(teamID)]"

@@ -51,7 +51,7 @@ import Achtung
 						GKAccessPoint.shared.isActive = true
 						self.isAuthenticated = true
 						print("Signed in to GameCenter as \(GKLocalPlayer.local.displayName)")
-						Task { await matchManager.reloadActiveGames() }
+						Task { await matchManager.reloadActiveMatches() }
 						if !resumed { resumed = true; continuation.resume(returning: true) }
 					}
 				}

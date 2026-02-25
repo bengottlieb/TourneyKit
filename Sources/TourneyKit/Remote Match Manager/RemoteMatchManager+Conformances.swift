@@ -26,12 +26,12 @@ extension RemoteMatchManager /* GKTurnBasedEventListener */ {
 	
 	public func player(_ player: GKPlayer, didRequestMatchWithOtherPlayers playersToInvite: [GKPlayer]) {
 		TKLogger.instance.log(.didRequestMatch(playersToInvite))
-		guard let gameType = turnBasedGameClass else {
-			tourneyLogger.error("Received a Match Request from GameCenter, but no turnBasedGameClass is set in the RemoteMatchManager. Please set this if you want to support these messages.")
+		guard let containerType = turnBasedContainerClass else {
+			tourneyLogger.error("Received a Match Request from GameCenter, but no turnBasedContainerClass is set in the RemoteMatchManager. Please set this if you want to support these messages.")
 			return
 		}
 		
-		let request = gameType.defaultRequest
+		let request = containerType.defaultRequest
 		request.recipients = playersToInvite
 		self.pendingMatchRequest = request
 	}

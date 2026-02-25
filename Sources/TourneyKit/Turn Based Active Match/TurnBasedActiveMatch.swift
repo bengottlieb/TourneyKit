@@ -17,13 +17,13 @@ import GameKit
 	func quitRequest(from player: GKPlayer, in match: GKTurnBasedMatch)
 }
 
-enum TurnBasedError: Error { case noMatchGame, triedToEndGameWhenNotPlaying, noMatchData }
+enum TurnBasedError: Error { case noMatchContainer, triedToEndMatchWhenNotPlaying, noMatchData }
 
-@MainActor @Observable public class TurnBasedActiveMatch<Game: TurnBasedContainer>: NSObject, SomeTurnBasedActiveMatch {
+@MainActor @Observable public class TurnBasedActiveMatch<Container: TurnBasedContainer>: NSObject, SomeTurnBasedActiveMatch {
 	public var match: GKTurnBasedMatch
-	@ObservationIgnored public weak var game: Game?
+	@ObservationIgnored public weak var container: Container?
 	@ObservationIgnored let manager: RemoteMatchManager
-	public var parentGame: AnyObject? { game }
+	public var parentContainer: AnyObject? { container }
 	public var currentPlayer: GKPlayer? { match.currentParticipant?.player }
 	public var status: GKTurnBasedMatch.Status { isLocalPlayerPlaying ? match.status : .ended }
 	public var isCurrentPlayersTurn: Bool { currentPlayer == GKLocalPlayer.local }
@@ -39,9 +39,9 @@ enum TurnBasedError: Error { case noMatchGame, triedToEndGameWhenNotPlaying, noM
 		return participants.compactMap { $0.player }
 	}
 	
-	public init(match: GKTurnBasedMatch, game: Game?, matchManager: RemoteMatchManager) {
+	public init(match: GKTurnBasedMatch, container: Container?, matchManager: RemoteMatchManager) {
 		self.match = match
-		self.game = game
+		self.container = container
 		self.manager = matchManager
 	}
 	
@@ -57,12 +57,12 @@ enum TurnBasedError: Error { case noMatchGame, triedToEndGameWhenNotPlaying, noM
 		RemoteMatchManager.instance.replace(match)
 	}
 	
-	public func endGame(withOutcome outcome: GKTurnBasedMatch.Outcome, nextPlayers: [GKPlayer]? = nil, timeOut: TimeInterval = 60.0) async throws {
+	public func endMatch(withOutcome outcome: GKTurnBasedMatch.Outcome, nextPlayers: [GKPlayer]? = nil, timeOut: TimeInterval = 60.0) async throws {
 		let matchData = try localMatchData
 		try await reloadMatch(loadingData: false)
 
 		if !isLocalPlayerPlaying {
-			throw TurnBasedError.triedToEndGameWhenNotPlaying
+			throw TurnBasedError.triedToEndMatchWhenNotPlaying
 		} else if isCurrentPlayersTurn {
 			let next = nextParticipants(startingWith: nextPlayers)
 			if next.isEmpty {
@@ -85,7 +85,7 @@ enum TurnBasedError: Error { case noMatchGame, triedToEndGameWhenNotPlaying, noM
 extension TurnBasedActiveMatch {
 	public var localMatchData: Data {
 		get throws {
-			guard let payload = game?.matchState else { throw TurnBasedError.noMatchGame }
+			guard let payload = container?.matchState else { throw TurnBasedError.noMatchContainer }
 			let data = try JSONEncoder().encode(payload)
 			return data
 		}
@@ -98,15 +98,15 @@ extension TurnBasedActiveMatch {
 		}
 	}
 	
-	public var localMatchState: Game.MatchState {
+	public var localMatchState: Container.MatchState {
 		get throws {
-			try JSONDecoder().decode(Game.MatchState.self, from: localMatchData)
+			try JSONDecoder().decode(Container.MatchState.self, from: localMatchData)
 		}
 	}
 
-	public var remoteMatchState: Game.MatchState {
+	public var remoteMatchState: Container.MatchState {
 		get throws {
-			try JSONDecoder().decode(Game.MatchState.self, from: remoteMatchData)
+			try JSONDecoder().decode(Container.MatchState.self, from: remoteMatchData)
 		}
 	}
 
@@ -117,9 +117,9 @@ extension TurnBasedActiveMatch {
 	func reloadMatch(loadingData: Bool) async throws {
 		try await match.loadMatchData()
 		if loadingData, let data = match.matchData {
-			let newState = try JSONDecoder().decode(Game.MatchState.self, from: data)
+			let newState = try JSONDecoder().decode(Container.MatchState.self, from: data)
 
-			game?.received(matchState: newState)
+			container?.received(matchState: newState)
 		}
 		RemoteMatchManager.instance.replace(match)
 	}
@@ -141,39 +141,39 @@ extension TurnBasedActiveMatch {
 		self.match = match
 		do {
 			if let data = match.matchData {
-				let payload = try JSONDecoder().decode(Game.MatchState.self, from: data)
-				game?.received(matchState: payload)
+				let payload = try JSONDecoder().decode(Container.MatchState.self, from: data)
+				container?.received(matchState: payload)
 			} else {
-				game?.received(matchState: nil)
+				container?.received(matchState: nil)
 			}
 		} catch {
-			tourneyLogger.error("Failed to decode Game State: \(error)")
+			tourneyLogger.error("Failed to decode match State: \(error)")
 		}
 	}
 	
 	public func matchEnded(for player: GKPlayer, in match: GKTurnBasedMatch) {
 		self.match = match
-		game?.matchEndedOnGameCenter()
+		container?.matchEndedOnGameCenter()
 	}
 
 	public func player(_ player: GKPlayer, receivedExchangeRequest exchange: GKTurnBasedExchange, in match: GKTurnBasedMatch) {
 		self.match = match
-		(game as? (any TurnBasedGameExchange))?.receivedExchangeRequest(exchange)
+		(container as? (any TurnBasedGameExchange))?.receivedExchangeRequest(exchange)
 	}
 	
 	public func player(_ player: GKPlayer, receivedExchangeCancellation exchange: GKTurnBasedExchange, in match: GKTurnBasedMatch) {
 		self.match = match
-		(game as? (any TurnBasedGameExchange))?.cancelledExchangeRequest(exchange)
+		(container as? (any TurnBasedGameExchange))?.cancelledExchangeRequest(exchange)
 	}
 	
 	public func player(_ player: GKPlayer, receivedExchangeReplies replies: [GKTurnBasedExchangeReply], forCompletedExchange exchange: GKTurnBasedExchange, in match: GKTurnBasedMatch) {
 		self.match = match
-		(game as? (any TurnBasedGameExchange))?.repliedToExchangeRequest(exchange, with: replies)
+		(container as? (any TurnBasedGameExchange))?.repliedToExchangeRequest(exchange, with: replies)
 	}
 	
 	public func quitRequest(from player: GKPlayer, in match: GKTurnBasedMatch) {
 		self.match = match
-		self.game?.playerDropped(player)
+		self.container?.playerDropped(player)
 	}
 	
 	public func removeMatch() async throws {
@@ -202,7 +202,7 @@ extension Array where Element == GKPlayer.PlayerTag {
 		}
 		
 		for index in indices {
-			if self[index].gameID == tag.gameID { return index }
+			if self[index].containerID == tag.containerID { return index }
 		}
 		
 		for index in indices {

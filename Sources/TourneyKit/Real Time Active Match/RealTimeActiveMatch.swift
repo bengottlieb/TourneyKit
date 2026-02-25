@@ -8,23 +8,23 @@
 import Foundation
 import GameKit
 
-@MainActor @Observable public class RealTimeActiveMatch<Game: RealTimeContainer>: NSObject, @preconcurrency GKMatchDelegate, SomeGameKitMatch {
+@MainActor @Observable public class RealTimeActiveMatch<Container: RealTimeContainer>: NSObject, @preconcurrency GKMatchDelegate, SomeGameKitMatch {
 	public let match: GKMatch
-	@ObservationIgnored public weak var game: Game?
+	@ObservationIgnored public weak var container: Container?
 	@ObservationIgnored let manager: RemoteMatchManager
 	public private(set) var phase: ActiveMatchPhase = .loading
 	public var recentlyReceivedData: [any MatchMessage] = []
 	@ObservationIgnored public var recentDataDepth = 5
 	public var recentErrors: [any Error] = []
 	public var allPlayers: [GKPlayer] { [GKLocalPlayer.local] + match.players }
-	public var parentGame: AnyObject? { game }
+	public var parentContainer: AnyObject? { container }
 
-	init(match: GKMatch, game: Game?, matchManager: RemoteMatchManager) {
+	init(match: GKMatch, container: Container?, matchManager: RemoteMatchManager) {
 		self.match = match
 		self.manager = matchManager
 		super.init()
 
-		self.game = game
+		self.container = container
 		match.delegate = self
 	}
 
@@ -69,7 +69,7 @@ import GameKit
 		if let error {
 			tourneyLogger.error("Match failed: \(error)")
 			recentErrors.append(error)
-			game?.matchFailed(withError: error)
+			container?.matchFailed(withError: error)
 		}
 		terminateLocally()
 	}
@@ -82,7 +82,7 @@ import GameKit
 
 		default: break
 		}
-		self.game?.playersChanged(to: allPlayers)
+		self.container?.playersChanged(to: allPlayers)
 	}
 
 	public func match(_ match: GKMatch, shouldReinviteDisconnectedPlayer player: GKPlayer) -> Bool {
@@ -99,6 +99,6 @@ import GameKit
 	func handleRemotePhaseChange(to newPhase: ActiveMatchPhase) {
 		if self.phase == newPhase { return }
 		self.phase = newPhase
-		game?.matchPhaseChanged(to: newPhase)
+		container?.matchPhaseChanged(to: newPhase)
 	}
 }
