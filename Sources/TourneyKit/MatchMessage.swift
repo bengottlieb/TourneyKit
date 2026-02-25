@@ -25,7 +25,7 @@ public struct MessagePlayerInfo: MatchMessage {
 	var kind = RawMessage.Kind.playerInfo
 	var name: String
 	let id: String
-	public init(_ player: GKPlayer) { name = player.displayName; id = player.teamPlayerID }
+	public init(_ player: GKPlayer) { name = player.displayName; id = player.tourneyKitID }
 }
 
 public struct MessageMatchState<Payload: Codable>: MatchMessage {

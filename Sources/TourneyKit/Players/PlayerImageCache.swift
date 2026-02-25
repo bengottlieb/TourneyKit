@@ -19,7 +19,7 @@ public class PlayerImageCache {
 
 	public func image(for optionalPlayer: GKPlayer?, size: GKPlayer.PhotoSize = .small) async throws -> UXImage {
 		let player = optionalPlayer ?? GKLocalPlayer.local
-		let key = player.teamPlayerID
+		let key = player.tourneyKitID
 		let cache = size == .normal ? normalCache : smallCache
 
 		if let cached = cache[key] { return cached }

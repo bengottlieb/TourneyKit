@@ -57,15 +57,16 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 		isAutomatching = false
 	}
 	
-	public func load<Container: RealTimeContainer>(match: GKMatch, container: Container) {
+	@discardableResult public func load<Container: RealTimeContainer>(match: GKMatch, container: Container) -> RealTimeActiveMatch<Container> {
 		retainedRealTimeContainer = container
 		let active = RealTimeActiveMatch(match: match, container: container, matchManager: self)
 		self.realTimeActiveMatch = active
 		container.loaded(match: active, with: active.allPlayers)
 		isAutomatching = false
+		return active
 	}
 
-	public func load<Container: TurnBasedContainer>(match: GKTurnBasedMatch, container: Container) {
+	@discardableResult public func load<Container: TurnBasedContainer>(match: GKTurnBasedMatch, container: Container) -> TurnBasedActiveMatch<Container> {
 		retainedTurnBasedContainer = container
 		replace(match)
 		container.clearOut()
@@ -74,6 +75,7 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 		container.loaded(match: active)
 		lastMatchID  = match.matchID
 		isAutomatching = false
+		return active
 	}
 	
 	public func reloadActiveMatches() async {

@@ -14,7 +14,7 @@ public extension GKPlayer {
 		self == GKLocalPlayer.local
 	}
 	
-	var tourneyKitID: String? {
+	var tourneyKitID: String {
 		gamePlayerID
 	}
 }

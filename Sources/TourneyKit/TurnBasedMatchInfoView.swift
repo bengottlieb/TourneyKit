@@ -53,7 +53,7 @@ public struct TurnBasedMatchInfoView: View {
 				}
 				if let player = participant.player {
 					Text("ID: ") + Text(player.playerTag.description).bold()
-					Text("\(player.teamPlayerID) / \(player.gamePlayerID)")
+					Text("\(player.tourneyKitID) / \(player.gamePlayerID)")
 						.font(.caption)
 				}
 				

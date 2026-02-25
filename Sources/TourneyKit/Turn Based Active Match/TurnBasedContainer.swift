@@ -9,7 +9,7 @@ import SwiftUI
 import GameKit
 import Observation
 
-public protocol TurnBasedContainer: Observable, AnyObject {
+@MainActor public protocol TurnBasedContainer: Observable, AnyObject {
 	associatedtype MatchState: Codable
 	
 	var matchState: MatchState { get set }

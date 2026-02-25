@@ -20,6 +20,8 @@ import Achtung
 		get { GKAccessPoint.shared.isActive }
 		set { GKAccessPoint.shared.isActive = newValue }
 	}
+	
+	public var localPlayerID: String { GKLocalPlayer.local.tourneyKitID }
 
 	@discardableResult public func authenticate() async -> Bool {
 		if isAuthenticated { return true }
@@ -44,7 +46,7 @@ import Achtung
 							}
 							return
 						}
-						PlayerCache.instance.set(name: GKLocalPlayer.local.displayName, id: GKLocalPlayer.local.teamPlayerID, for: GKLocalPlayer.local)
+						PlayerCache.instance.set(name: GKLocalPlayer.local.displayName, id: GKLocalPlayer.local.tourneyKitID, for: GKLocalPlayer.local)
 						GKLocalPlayer.local.register(matchManager)
 						GKAccessPoint.shared.location = .topLeading
 						GKAccessPoint.shared.showHighlights = true
