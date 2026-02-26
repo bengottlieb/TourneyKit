@@ -22,6 +22,7 @@ import Achtung
 	}
 	
 	public nonisolated static var localPlayerID: String { GKLocalPlayer.local.tourneyKitID }
+	public nonisolated static var localPlayerName: String { GKLocalPlayer.local.displayName }
 
 	@discardableResult public func authenticate() async -> Bool {
 		if isAuthenticated { return true }

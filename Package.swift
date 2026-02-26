@@ -19,7 +19,7 @@ let package = Package(
     dependencies: [
 		.package(url: "https://github.com/ios-tooling/CrossPlatformKit.git", from: "1.0.12"),
 		.package(url: "https://github.com/ios-tooling/JohnnyCache.git", from: "1.0.9"),
-		.package(url: "https://github.com/ios-tooling/Achtung.git", from: "0.3.18"),
+		.package(url: "https://github.com/ios-tooling/Achtung.git", from: "0.4.0"),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.

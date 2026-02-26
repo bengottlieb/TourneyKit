@@ -26,7 +26,7 @@ public struct PlayerLabel: View {
 					.clipShape(Circle())
 					.frame(height: 20)
 			}
-			Text(player.displayName)
+			Text(player.isLocalPlayer ? "Me" : player.displayName)
 		}
 		.onTapGesture {
 			showingDetails.toggle()
