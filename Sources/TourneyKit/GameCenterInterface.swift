@@ -16,6 +16,11 @@ import Achtung
 	@ObservationIgnored private var authTask: Task<Bool, Never>?
 	public var isAuthenticated = false
 
+	/// Whether to show Game Center's floating access point once authenticated.
+	/// Set to false (before authenticating) to keep it hidden; honored on every
+	/// authentication callback, so GameKit can't re-enable it behind your back.
+	public static var showsAccessPoint = true
+
 	public var showingGameCenterAvatar: Bool {
 		get { GKAccessPoint.shared.isActive }
 		set { GKAccessPoint.shared.isActive = newValue }
@@ -51,7 +56,7 @@ import Achtung
 						GKLocalPlayer.local.register(matchManager)
 						GKAccessPoint.shared.location = .topLeading
 						GKAccessPoint.shared.showHighlights = true
-						GKAccessPoint.shared.isActive = true
+						GKAccessPoint.shared.isActive = Self.showsAccessPoint
 						self.isAuthenticated = true
 						print("Signed in to GameCenter as \(GKLocalPlayer.local.displayName)")
 						Task { await matchManager.reloadActiveMatches() }
