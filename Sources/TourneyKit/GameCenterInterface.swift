@@ -9,6 +9,7 @@
 import UIKit
 import GameKit
 import Achtung
+import Suite
 
 @MainActor @Observable public class GameCenterInterface {
 	public static let instance = GameCenterInterface()
@@ -38,6 +39,10 @@ import Achtung
 			await withCheckedContinuation { continuation in
 				var resumed = false
 				GKLocalPlayer.local.authenticateHandler = { viewController, error in
+					if error?.isFailedToConnectToGameCenter == true {
+						print("*** FAILED TO CONNECT TO GAME CENTER ***")
+						return
+					}
 					MainActor.assumeIsolated {
 						if let viewController {
 							self.rootViewController?.present(viewController, animated: true)
