@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  GameCenterInterface.swift
 //
 //
 //  Created by Ben Gottlieb on 5/23/23.
@@ -9,7 +9,6 @@
 import UIKit
 import GameKit
 import Achtung
-import Suite
 
 @MainActor @Observable public class GameCenterInterface {
 	public static let instance = GameCenterInterface()
