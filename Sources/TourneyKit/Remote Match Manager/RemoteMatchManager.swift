@@ -87,7 +87,11 @@ enum MatchManagerError: Error { case missingMatchID, restoreInProgress, alreadyH
 			hasLoaded = true
 		} catch {
 			if showErrors, (loadingError as? NSError) != (error as NSError) {
-				await Achtung.show(error)
+				if error.isFailedToConnectToGameCenter {
+					print("*** FAILED TO CONNECT TO GAME CENTER ***")
+				} else {
+					await Achtung.show(error)
+				}
 			}
 			loadingError = error
 			print("Failed to reload active matches: \(error.localizedDescription)")
